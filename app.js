@@ -188,6 +188,7 @@ function addMarkAtClientXY(clientX, clientY, type='point'){
   const relX = (clientX - rect.left) / rect.width;
   const relY = (clientY - rect.top) / rect.height;
   if(relX < 0 || relX > 1 || relY < 0 || relY > 1) return;
+  
   const newMark = {
     id: uid('mk'),
     type: type,
@@ -324,50 +325,65 @@ stage.addEventListener('click', (e)=>{
 let isPanning = false;
 let panStart = null;
 
-stage.addEventListener('wheel', (e)=>{
+stage.addEventListener('wheel', (e) => {
   if(!getCurrentModule() || !getCurrentModule().photo) return;
   e.preventDefault();
+
+  const rect = stage.getBoundingClientRect();
+  const mx = e.clientX - rect.left; // mouse em coords do stage
+  const my = e.clientY - rect.top;
+
+  const prevScale = state.scale;
   const delta = -e.deltaY;
   const step = delta > 0 ? 1.1 : 0.9;
-  const prevScale = state.scale;
   let newScale = Math.max(0.2, Math.min(5, prevScale * step));
+
+  // ponto em coordenadas de conteúdo (antes do scale)
+  const contentY = (my - state.translate.y) / prevScale;
+  const contentX = (mx - state.translate.x) / prevScale;
+
+  // após novo scale, queremos que contentX/contentY esteja na mesma posição do mouse
+  state.translate.x = mx - contentX * newScale;
+  state.translate.y = my - contentY * newScale;
+
   state.scale = newScale;
   applyTransform();
 }, { passive:false });
 
-stage.addEventListener('mousedown', (e)=>{
-  // right button or spacebar or middle -> pan
-  if(e.button === 2 || e.button === 1 || e.shiftKey || e.altKey){
+
+window.addEventListener('mouseup', ()=>{
+document.addEventListener('contextmenu', event => event.preventDefault());
+  if(isPanning){ isPanning = false; panStart = null; stage.style.cursor='default'; saveToStorage(); }
+  stage.addEventListener('mousedown', (e) => {
+  if (e.button === 2) { 
     isPanning = true;
-    panStart = { x: e.clientX, y: e.clientY, tx: state.translate.x, ty: state.translate.y };
-    stage.style.cursor = 'grabbing';
-    e.preventDefault();
+    panStart = { x: e.clientX - state.translate.x, y: e.clientY - state.translate.y };
+    stage.style.cursor = 'grabbing'; // ou 'move'
   }
 });
 
-window.addEventListener('mousemove', (e)=>{
-  if(!isPanning || !panStart) return;
-  const dx = e.clientX - panStart.x;
-  const dy = e.clientY - panStart.y;
-  state.translate.x = panStart.tx + dx;
-  state.translate.y = panStart.ty + dy;
-  applyTransform();
+stage.addEventListener('mousemove', (e) => {
+  if (!isPanning) return;
+
+  state.translate.x = e.clientX - panStart.x;
+  state.translate.y = e.clientY - panStart.y;
+
+  applyTransform(); // atualiza a posição na tela
+});
 });
 
-window.addEventListener('mouseup', ()=>{
-  if(isPanning){ isPanning = false; panStart = null; stage.style.cursor='default'; saveToStorage(); }
-});
-
-/* For touch devices - basic pinch/drag could be added but skipping for simplicity */
 
 /* apply CSS transform to stage children (img & marksLayer) */
 function applyTransform(){
-  // apply transform to image and marks layer simultaneously
-  // we use transform on the stage's firstChild container by styling stage's children
-  stageImg.style.transform = `translate(${state.translate.x}px, ${state.translate.y}px) scale(${state.scale})`;
-  marksLayer.style.transform = `translate(${state.translate.x}px, ${state.translate.y}px) scale(${state.scale})`;
-  stageImg.style.transformOrigin = '0 0';
-  marksLayer.style.transformOrigin = '0 0';
+  const content = document.getElementById('stageContent');
+  if (!content) return;
+
+  content.style.transform = `translate(${state.translate.x}px, ${state.translate.y}px) scale(${state.scale})`;
+  content.style.transformOrigin = '0 0';
+  
+  // Importante: remover transform dos filhos
+  stageImg.style.transform = 'none';
+  marksLayer.style.transform = 'none';
 }
 
 /* EXPORT / IMPORT */
@@ -471,6 +487,8 @@ function init(){
 newModuleBtn.addEventListener('click', createModule);
 
 /* prevent context menu on stage for nicer pan */
-stage.addEventListener('contextmenu', (e)=>{ e.preventDefault(); });
+stage.addEventListener('contextmenu', (e) => {
+  if(isPanning) e.preventDefault();
+});
 
 init();
