@@ -1,7 +1,7 @@
 :root{
   --bg:#000000;
-  --panel:#141414;
-  --muted:#202020;
+  --panel:#1f1e1e;
+  --muted:#0044ff;
   --accent:#00ff7f;     /* neon green */
   --accent-soft:#0aff87;
   --danger:#ff3b3b;
@@ -168,7 +168,7 @@ body{
 
 /* Editor lateral */
 .module-info{
-  width:300px;
+  width:100%;
   background:var(--panel);
   padding:16px;
   border-radius:var(--radius);
@@ -177,6 +177,7 @@ body{
   flex-direction:column;
   gap:12px;
   border:1px solid #111;
+  margin-bottom: 24px;
 }
 .module-info input,
 .module-info textarea{
@@ -187,7 +188,7 @@ body{
   background:#0a0a0a;
   color:#ddd;
 }
-.module-info textarea{min-height:120px; resize:vertical;}
+.module-info textarea{min-height:20px; resize:vertical;}
 
 .info-actions{
   display:flex;
@@ -207,15 +208,14 @@ body{
 
 .stage-wrap{
   flex:1;
-  min-height:500px;
+  min-height:400%;
   display:flex;
   flex-direction:column;
-  margin-left: 340px;
 }
 
 .stage{
   flex:1;
-  background:#111;
+  background:#1f1e1e;
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   overflow:hidden;
@@ -260,11 +260,14 @@ body{
   user-select:none;
 }
 .mark .dot{
-  width:13px;
-  height:13px;
-  border-radius:50%;
+  width:43px;
+  height:43px;
+  border-radius:10%;
   background:var(--accent);
   box-shadow:0 0 10px rgba(0,255,150,0.8);
+  transform: scale(1);
+  transform-origin: center;
+  cursor: nwse-resize;
 }
 .mark .label{
   background:#111;
