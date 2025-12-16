@@ -4,6 +4,16 @@
 
 const STORAGE_KEY = 'mini_ecu_data_v1';
 const LAST_MODULE_KEY = 'mini_ecu_last_v1';
+let markPressTimer = null;
+let markPressStart = null;
+const MARK_HOLD_TIME = 1000; // 1 segundo
+const MOVE_TOLERANCE = 5;    // px
+const dot = document.querySelector('.mark .dot');
+let isResizing = false;
+let startY = 0;
+let startScale = 1;
+let scale = 1;
+
 
 let state = {
   modules: [],
@@ -150,10 +160,22 @@ function renderMarks(){
   (mod.marks||[]).forEach(mark=>{
     const el = markTpl.content.firstElementChild.cloneNode(true);
     const dot = el.querySelector('.dot');
+    dot.style.transform = `scale(${mark.size || 1})`;
     const label = el.querySelector('.label');
     const delBtn = el.querySelector('.mark-delete');
 
     label.textContent = mark.label || (mark.type === 'point' ? '' : 'text');
+
+    dot.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const delta = e.deltaY < 0 ? 0.1 : -0.1;
+  mark.size = Math.max(0.3, Math.min(4, (mark.size || 1) + delta));
+
+  dot.style.transform = `scale(${mark.size})`;
+  saveToStorage();
+}, { passive: false });
 
     // position as percentage
     el.style.left = (mark.x*100) + '%';
@@ -162,10 +184,11 @@ function renderMarks(){
     el.classList.toggle('text-mark', mark.type === 'text');
 
     // events
-    el.addEventListener('mousedown', (ev)=>{
-      ev.stopPropagation();
-      startDragMark(ev, mark, el);
-    });
+     el.addEventListener('mousedown', (ev)=>{
+  if(ev.button !== 0) return;
+  ev.stopPropagation();
+  startDragMark(ev, mark, el);
+});
 
     el.addEventListener('dblclick', (ev)=>{
       ev.stopPropagation();
@@ -179,6 +202,8 @@ function renderMarks(){
 
     marksLayer.appendChild(el);
   });
+ 
+
 }
 
 function addMarkAtClientXY(clientX, clientY, type='point'){
@@ -190,12 +215,14 @@ function addMarkAtClientXY(clientX, clientY, type='point'){
   if(relX < 0 || relX > 1 || relY < 0 || relY > 1) return;
   
   const newMark = {
-    id: uid('mk'),
-    type: type,
-    x: parseFloat(relX.toFixed(6)),
-    y: parseFloat(relY.toFixed(6)),
-    label: type === 'text' ? 'TEXT' : ''
-  };
+  id: uid('mk'),
+  type: type,
+  x: parseFloat(relX.toFixed(6)),
+  y: parseFloat(relY.toFixed(6)),
+  label: type === 'text' ? 'TEXT' : '',
+  size: 1 // escala inicial
+};
+
   mod.marks = mod.marks || [];
   mod.marks.push(newMark);
   saveToStorage();
@@ -294,32 +321,31 @@ function setTool(t){
 }
 
 /* STAGE CLICK -> add mark */
-stage.addEventListener('click', (e)=>{
-  // ignore clicks when no module or no image
+stage.addEventListener('mousedown', (e) => {
+  if (e.button !== 0) return; // só botão esquerdo
+
   const mod = getCurrentModule();
-  if(!mod || !mod.photo) return;
-  // if target was a mark or UI, ignore
-  if(e.target.closest('.mark')) return;
-  if(state.tool === 'point'){
-    addMarkAtClientXY(e.clientX, e.clientY, 'point');
-  } else if(state.tool === 'text'){
-    addMarkAtClientXY(e.clientX, e.clientY, 'text');
-    // prompt label inline via next render
-    // open edit for last mark
-    setTimeout(()=> {
-      const marks = mod.marks || [];
-      const last = marks[marks.length-1];
-      if(last){
-        // find element and trigger edit
-        const el = marksLayer.querySelector(`[data-mark-id="${last.id}"]`);
-        if(el){
-          const labelEl = el.querySelector('.label');
-          editMarkLabel(last, labelEl);
-        }
-      }
-    }, 10);
-  }
+  if (!mod || !mod.photo) return;
+
+  // não criar mark se clicou em mark existente
+  if (e.target.closest('.mark')) return;
+
+  markPressStart = { x: e.clientX, y: e.clientY };
+
+  markPressTimer = setTimeout(() => {
+    addMarkAtClientXY(e.clientX, e.clientY, state.tool);
+    markPressTimer = null;
+  }, MARK_HOLD_TIME);
 });
+
+stage.addEventListener('mouseup', () => {
+  if (markPressTimer) {
+    clearTimeout(markPressTimer);
+    markPressTimer = null;
+  }
+  markPressStart = null;
+});
+
 
 /* PAN & ZOOM */
 let isPanning = false;

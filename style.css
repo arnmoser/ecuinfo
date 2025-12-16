@@ -208,7 +208,7 @@ body{
 
 .stage-wrap{
   flex:1;
-  min-height:400%;
+  min-height: clamp(500px, 80vh, 985px);
   display:flex;
   flex-direction:column;
 }
@@ -264,11 +264,13 @@ body{
   height:43px;
   border-radius:10%;
   background:var(--accent);
-  box-shadow:0 0 10px rgba(0,255,150,0.8);
-  transform: scale(1);
+  box-shadow:0 0 10px rgba(0, 255, 149, 0.13);
+  opacity: 0.4;
   transform-origin: center;
-  cursor: nwse-resize;
+  cursor: zoom-in;
+
 }
+
 .mark .label{
   background:#111;
   padding:4px 8px;
