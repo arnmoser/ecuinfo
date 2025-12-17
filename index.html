@@ -48,16 +48,14 @@
         </aside>
 
         <div class="stage-wrap">
-  <div id="stage" class="stage">
-    <div id="stageContent">
-      <img id="stageImg" src="" alt="ECU Photo">
-      <div id="marksLayer" class="marks-layer"></div>
-    </div>
-  </div>
-</div>
+          <div id="stage" class="stage">
+            <div id="stageContent">
+              <img id="stageImg" src="" alt="ECU Photo">
+              <div id="marksLayer" class="marks-layer"></div>
+            </div>
+          </div>
           <div class="hint">Use roda do mouse para zoom • Arraste a imagem segurando botão direito</div>
-        </div>
-      </section>
+        </div> </section>
     </main>
   </div>
 
@@ -76,6 +74,24 @@
     </div>
   </template>
 
-<script type="module" src="./src/main.js"></script>
+  <div id="mark-modal-overlay" class="modal-overlay hidden">
+    <div class="modal-box">
+      <h3>Editar Marcação</h3>
+      <div class="form-group">
+        <label for="mark-title-input">Título:</label>
+        <input type="text" id="mark-title-input">
+      </div>
+      <div class="form-group">
+        <label for="mark-desc-input">Descrição:</label>
+        <textarea id="mark-desc-input" rows="4"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button id="btn-cancel-mark" class="btn-secondary">Cancelar</button>
+        <button id="btn-save-mark" class="btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
 </body>
 </html>

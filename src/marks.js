@@ -5,6 +5,7 @@ import { uid } from './utils.js';
 import { saveToStorage } from './storage.js';
 import { renderMarks } from './rendering.js';
 import { MARK_HOLD_TIME } from './constants.js';
+import { modalOverlay, titleInput, descInput, btnSaveMark, btnCancelMark } from './dom.js';
 
 let markPressTimer = null;
 let markPressStart = null;
@@ -23,14 +24,56 @@ export function addMarkAtClientXY(clientX, clientY, type='point'){
     type: type,
     x: parseFloat(relX.toFixed(6)),
     y: parseFloat(relY.toFixed(6)),
-    label: type === 'text' ? 'TEXT' : '',
-    size: 1 // escala inicial
+    label: type === 'text' ? 'Clique Para Nomear' : '',
+    title: '',       
+    description: '', 
+    size: 1 
   };
 
   mod.marks = mod.marks || [];
   mod.marks.push(newMark);
   saveToStorage();
   renderMarks();
+
+  // Se for texto, abre o menu limpo
+  if (type === 'text') {
+    openTextMarkMenu(newMark);
+  }
+}
+
+/* --- FUNÇÃO LIMPA: Apenas lógica de controle --- */
+export function openTextMarkMenu(mark) {
+    // 1. Preenche os inputs com os dados atuais da mark
+    titleInput.value = mark.title || '';
+    descInput.value = mark.description || '';
+
+    // 2. Define o que acontece ao clicar em SALVAR
+    // Usamos .onclick para sobrescrever qualquer handler anterior e evitar duplicação
+    btnSaveMark.onclick = () => {
+        mark.title = titleInput.value;
+        mark.description = descInput.value;
+        
+        mark.label = mark.title || 'TEXT'; 
+
+        saveToStorage();
+        renderMarks(); // Atualiza a tela (e os tooltips)
+        closeModal();
+    };
+
+    // 3. Define o que acontece ao clicar em CANCELAR
+    btnCancelMark.onclick = () => {
+        closeModal();
+    };
+
+    // 4. Mostra o modal (remove a classe hidden)
+    modalOverlay.classList.remove('hidden');
+    
+    // 5. Foco no input
+    titleInput.focus();
+}
+
+function closeModal() {
+    modalOverlay.classList.add('hidden');
 }
 
 export function deleteMark(markId){

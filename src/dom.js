@@ -16,5 +16,12 @@ export const quickSearch = document.getElementById('quickSearch');
 export const deleteModuleBtn = document.getElementById('deleteModuleBtn');
 export const moduleTpl = document.getElementById('moduleItemTpl');
 export const markTpl = document.getElementById('markTpl');
+export const modalOverlay = document.getElementById('mark-modal-overlay');
+export const titleInput = document.getElementById('mark-title-input');
+export const descInput = document.getElementById('mark-desc-input');
+export const btnSave = document.getElementById('btn-save-mark');
+export const btnCancel = document.getElementById('btn-cancel-mark');
+export const btnCancelMark = document.getElementById('btn-cancel-mark');
+export const btnSaveMark = document.getElementById('btn-save-mark');
 // Elemento dinâmico para transformações
 export const getStageContent = () => document.getElementById('stageContent');
