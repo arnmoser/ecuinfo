@@ -1,11 +1,12 @@
-/* rendering.js - Manipulação da UI */
+/* rendering.js - Manipulação da UI (VERSÃO CORRETA) */
 import { state, getCurrentModule } from './state.js';
 import { 
   moduleListEl, moduleSearch, moduleTpl, moduleNameInput, 
   moduleNotesInput, stageImg, marksLayer, markTpl, quickSearch 
 } from './dom.js';
 import { saveToStorage } from './storage.js';
-import { deleteMark, editMarkLabel, startDragMark } from './marks.js';
+import { deleteMark, editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
+
 
 export function renderModuleList(){
   const q = moduleSearch.value.trim().toLowerCase();
@@ -51,7 +52,9 @@ export function renderCurrentModule(){
   renderModuleList();
 }
 
+
 export function renderMarks(){
+    
   const mod = getCurrentModule();
   marksLayer.innerHTML = '';
   if(!mod) return;
@@ -62,12 +65,42 @@ export function renderMarks(){
   (mod.marks||[]).forEach(mark=>{
     const el = markTpl.content.firstElementChild.cloneNode(true);
     const dot = el.querySelector('.dot');
-    dot.style.transform = `scale(${mark.size || 1})`;
     const label = el.querySelector('.label');
     const delBtn = el.querySelector('.mark-delete');
 
-    label.textContent = mark.label || (mark.type === 'point' ? '' : 'text');
+    dot.style.transform = `scale(${mark.size || 1})`;
+    // Atualiza o label: se for texto, mostra o título ou 'TEXT'
+    label.textContent = mark.label || (mark.type === 'text' ? (mark.title || 'TEXT') : '');
 
+    // position as percentage
+    el.style.left = (mark.x*100) + '%';
+    el.style.top = (mark.y*100) + '%';
+    el.dataset.markId = mark.id;
+    el.classList.toggle('text-mark', mark.type === 'text');
+
+    // =======================================================
+    // NOVO COMPORTAMENTO PARA MARCAS DE TEXTO (HOVER E CLICK)
+    // =======================================================
+    if (mark.type === 'text') {
+        // 1. Hover (Tooltip nativo): Exibe o título
+        el.title = mark.title || "Marca de Texto"; 
+
+        // 2. Click para editar: Abre o menu de Título/Descrição
+        el.addEventListener('click', (e) => {
+            e.stopPropagation(); // Impede criar outro ponto
+            openTextMarkMenu(mark); // Chama a função importada
+        });
+        
+        // Impede que o dblclick abra o editor de label padrão em marcas de texto
+    } else {
+        el.addEventListener('dblclick', (ev)=>{
+            ev.stopPropagation();
+            editMarkLabel(mark, label);
+        });
+    }
+    // =======================================================
+    
+    // events (Mantenha os eventos de drag e zoom/delete)
     dot.addEventListener('wheel', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -79,32 +112,22 @@ export function renderMarks(){
       saveToStorage();
     }, { passive: false });
 
-    // position as percentage
-    el.style.left = (mark.x*100) + '%';
-    el.style.top = (mark.y*100) + '%';
-    el.dataset.markId = mark.id;
-    el.classList.toggle('text-mark', mark.type === 'text');
-
-    // events
     el.addEventListener('mousedown', (ev)=>{
       if(ev.button !== 0) return;
       ev.stopPropagation();
       startDragMark(ev, mark, el);
     });
-
-    el.addEventListener('dblclick', (ev)=>{
-      ev.stopPropagation();
-      editMarkLabel(mark, label);
-    });
-
+    
     delBtn.addEventListener('click', (ev)=>{
       ev.stopPropagation();
       deleteMark(mark.id);
     });
     
-    // Quick Search visibility logic
+    // Quick Search visibility logic (CORRIGIDA PARA INCLUIR TITLE/DESCRIPTION)
     if(q){
-       const matches = (mark.label||'').toLowerCase().includes(q);
+       const matches = (mark.label||'').toLowerCase().includes(q) || 
+                       (mark.title||'').toLowerCase().includes(q) || 
+                       (mark.description||'').toLowerCase().includes(q); 
        el.style.display = matches ? 'flex' : 'none';
     }
 
