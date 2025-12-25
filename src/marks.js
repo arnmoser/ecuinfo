@@ -2,10 +2,10 @@
 import { state, getCurrentModule } from './state.js';
 import { stage, marksLayer } from './dom.js';
 import { uid } from './utils.js';
-import { saveToStorage } from './storage.js';
 import { renderMarks } from './rendering.js';
 import { MARK_HOLD_TIME } from './constants.js';
 import { modalOverlay, titleInput, descInput, btnSaveMark, btnCancelMark } from './dom.js';
+import { syncSaveButton } from './ui-modal.js';
 
 let markPressTimer = null;
 let markPressStart = null;
@@ -32,7 +32,8 @@ export function addMarkAtClientXY(clientX, clientY, type='point'){
 
   mod.marks = mod.marks || [];
   mod.marks.push(newMark);
-  saveToStorage();
+  state.dirty = true;
+  syncSaveButton();
   renderMarks();
 
   // Se for texto, abre o menu limpo
@@ -55,7 +56,8 @@ export function openTextMarkMenu(mark) {
         
         mark.label = mark.title || 'TEXT'; 
 
-        saveToStorage();
+        state.dirty = true;
+        syncSaveButton();
         renderMarks(); // Atualiza a tela (e os tooltips)
         closeModal();
     };
@@ -82,7 +84,8 @@ export function deleteMark(markId){
   const idx = mod.marks.findIndex(m=>m.id===markId);
   if(idx>=0){
     mod.marks.splice(idx,1);
-    saveToStorage();
+    state.dirty = true;
+    syncSaveButton();
     renderMarks();
   }
 }
@@ -97,7 +100,8 @@ export function editMarkLabel(mark, labelEl){
   input.select();
   input.addEventListener('blur', ()=>{
     mark.label = input.value;
-    saveToStorage();
+    state.dirty = true;
+    syncSaveButton();
     renderMarks();
   });
   input.addEventListener('keydown', (e)=>{
@@ -129,7 +133,8 @@ function onDragMark(e){
 function endDragMark(){
   if(!currentDrag) return;
   currentDrag.el.classList.remove('dragging');
-  saveToStorage();
+  state.dirty = true;
+  syncSaveButton();
   currentDrag = null;
   window.removeEventListener('mousemove', onDragMark);
   window.removeEventListener('mouseup', endDragMark);

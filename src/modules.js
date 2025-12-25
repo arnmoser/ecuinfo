@@ -3,6 +3,7 @@ import { state, getCurrentModule } from './state.js';
 import { uid } from './utils.js';
 import { saveToStorage } from './storage.js';
 import { renderModuleList, renderCurrentModule } from './rendering.js';
+import { syncSaveButton } from './ui-modal.js';
 
 export function createModule(){
   const m = {
@@ -14,7 +15,8 @@ export function createModule(){
   };
   state.modules.unshift(m);
   state.currentModuleId = m.id;
-  saveToStorage();
+  state.dirty = true;
+  syncSaveButton();
   renderModuleList();
   renderCurrentModule();
 }
@@ -26,7 +28,8 @@ export function deleteCurrentModule(){
     if(!confirm('Deletar módulo selecionado?')) return;
     state.modules.splice(idx,1);
     state.currentModuleId = state.modules[0] ? state.modules[0].id : null;
-    saveToStorage();
+    state.dirty = true;
+    syncSaveButton();
     renderModuleList();
     renderCurrentModule();
   }

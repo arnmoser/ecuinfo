@@ -1,8 +1,7 @@
 /* stage.js - Lógica de Pan e Zoom */
 import { state, getCurrentModule } from './state.js';
 import { getStageContent, stage, stageImg, marksLayer } from './dom.js';
-import { saveToStorage } from './storage.js';
-
+import { syncSaveButton } from './ui-modal.js';
 let isPanning = false;
 let panStart = null;
 
@@ -46,7 +45,7 @@ export function setupStagePanZoom(){
 
   window.addEventListener('mouseup', ()=>{
     document.addEventListener('contextmenu', event => event.preventDefault());
-    if(isPanning){ isPanning = false; panStart = null; stage.style.cursor='default'; saveToStorage(); }
+    if(isPanning){ isPanning = false; panStart = null; stage.style.cursor='default'; state.dirty = true; syncSaveButton(); }
     
     // Re-attach mousedown logic inside mouseup wrapper as per original structure logic 
     // (Wait, original logic attached mousedown inside global mouseup? 

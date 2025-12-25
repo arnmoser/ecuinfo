@@ -6,6 +6,7 @@ import {
 } from './dom.js';
 import { saveToStorage } from './storage.js';
 import { deleteMark, editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
+import { syncSaveButton } from './ui-modal.js';
 
 
 export function renderModuleList(){
@@ -22,7 +23,8 @@ export function renderModuleList(){
     item.querySelector('.subtitle').textContent = (mod.marks||[]).length + ' marcas';
     item.addEventListener('click', ()=> {
       state.currentModuleId = mod.id;
-      saveToStorage();
+      state.dirty = true;
+      syncSaveButton();
       renderModuleList();
       renderCurrentModule();
     });
@@ -109,7 +111,8 @@ export function renderMarks(){
       mark.size = Math.max(0.3, Math.min(4, (mark.size || 1) + delta));
 
       dot.style.transform = `scale(${mark.size})`;
-      saveToStorage();
+      state.dirty = true;
+      syncSaveButton();
     }, { passive: false });
 
     el.addEventListener('mousedown', (ev)=>{

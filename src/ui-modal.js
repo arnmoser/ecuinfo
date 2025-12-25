@@ -1,5 +1,12 @@
 import { saveToStorage } from './storage.js';
 import { renderMarks } from './rendering.js';
+import { btnSaveProject } from './dom.js';
+import { state } from './state.js';
+
+export function syncSaveButton(){
+  if (!btnSaveProject) return;
+  btnSaveProject.disabled = !state.dirty;
+}
 
 export function openTextMarkModal(mark){
   const overlay = document.createElement('div');
@@ -37,7 +44,9 @@ export function openTextMarkModal(mark){
   save.onclick = () => {
     mark.title = inputTitle.value;
     mark.description = inputDesc.value;
-    saveToStorage();
+    state.dirty = true;
+    syncSaveButton();
+    btnSaveProject.disabled = false;
     renderMarks();
     overlay.remove();
   };
