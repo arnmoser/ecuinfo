@@ -1,47 +1,124 @@
 /* events.js - Configuração de Event Listeners Globais */
-import { 
-  newModuleBtn, deleteModuleBtn, toolPointBtn, toolTextBtn, 
-  photoInput, exportBtn, importInput, moduleNameInput, moduleNotesInput,
-  moduleSearch, quickSearch
+
+import {
+  newModuleBtn,
+  deleteModuleBtn,
+  toolPointBtn,
+  toolTextBtn,
+  photoInput,
+  exportBtn,
+  importInput,
+  moduleNameInput,
+  moduleNotesInput,
+  moduleSearch,
+  quickSearch,
+  btnSaveProject
 } from './dom.js';
+
 import { createModule, deleteCurrentModule } from './modules.js';
 import { state, getCurrentModule } from './state.js';
 import { fileToDataURL } from './utils.js';
 import { saveToStorage } from './storage.js';
-import { renderCurrentModule, renderModuleList, renderMarks } from './rendering.js';
+import {
+  renderCurrentModule,
+  renderModuleList,
+  renderMarks
+} from './rendering.js';
+import { syncSaveButton } from './ui-modal.js';
+import { saveProjectToSupabase } from './services/supabaseStorage.js';
 
-export function setupGlobalEvents(){
-  
-  newModuleBtn.addEventListener('click', createModule);
-  deleteModuleBtn.addEventListener('click', deleteCurrentModule);
+/* ======================
+   SAVE HANDLER
+   ====================== */
 
-  /* TOOL HANDLERS */
-  toolPointBtn.addEventListener('click', ()=> setTool('point'));
-  toolTextBtn.addEventListener('click', ()=> setTool('text'));
+async function handleSaveProject() {
+  if (!state.dirty) return;
 
-  function setTool(t){
-    state.tool = t;
-    toolPointBtn.classList.toggle('active', t==='point');
-    toolTextBtn.classList.toggle('active', t==='text');
+  let payload;
+
+  // 1. Salva local (fonte de verdade)
+  try {
+    payload = saveToStorage();
+  } catch (err) {
+    console.error('[local] Falha ao salvar', err);
+    alert('Erro ao salvar localmente.');
+    return;
   }
 
-  /* IMAGE UPLOAD & SAVE */
-  photoInput.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    const data = await fileToDataURL(f);
-    const mod = getCurrentModule();
-    if(!mod) return alert('Selecione um módulo antes de adicionar foto.');
-    mod.photo = data;
-    saveToStorage();
+  // 2. Tenta sincronizar remoto (best-effort)
+  try {
+    await saveProjectToSupabase(payload);
+    console.log('[remote] Projeto sincronizado');
+  } catch (err) {
+    console.error('[remote] Falha ao sincronizar', err);
+    alert(
+      'Projeto salvo localmente, mas não foi possível sincronizar com o servidor.'
+    );
+  }
+
+  // 3. Finaliza ciclo
+  state.dirty = false;
+  syncSaveButton();
+}
+
+/* ======================
+   TOOL HANDLER
+   ====================== */
+
+function setTool(tool) {
+  state.tool = tool;
+  toolPointBtn?.classList.toggle('active', tool === 'point');
+  toolTextBtn?.classList.toggle('active', tool === 'text');
+}
+
+/* ======================
+   GLOBAL EVENTS SETUP
+   ====================== */
+
+export function setupGlobalEvents() {
+  /* -------- SAVE -------- */
+  if (btnSaveProject) {
+    btnSaveProject.disabled = !state.dirty;
+    btnSaveProject.addEventListener('click', handleSaveProject);
+  }
+
+  /* -------- MODULES -------- */
+  newModuleBtn?.addEventListener('click', createModule);
+  deleteModuleBtn?.addEventListener('click', deleteCurrentModule);
+
+  /* -------- TOOLS -------- */
+  toolPointBtn?.addEventListener('click', () => setTool('point'));
+  toolTextBtn?.addEventListener('click', () => setTool('text'));
+
+  /* -------- IMAGE UPLOAD -------- */
+  photoInput?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const module = getCurrentModule();
+    if (!module) {
+      alert('Selecione um módulo antes de adicionar uma imagem.');
+      photoInput.value = '';
+      return;
+    }
+
+    module.photo = await fileToDataURL(file);
+    state.dirty = true;
+    syncSaveButton();
     renderCurrentModule();
+
     photoInput.value = '';
   });
 
-  /* EXPORT / IMPORT */
-  exportBtn.addEventListener('click', ()=>{
-    const payload = { modules: state.modules.slice() };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  /* -------- EXPORT -------- */
+  exportBtn?.addEventListener('click', () => {
+    const payload = { modules: structuredClone(state.modules) };
+
+    const blob = new Blob(
+      [JSON.stringify(payload, null, 2)],
+      { type: 'application/json' }
+    );
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -52,56 +129,63 @@ export function setupGlobalEvents(){
     URL.revokeObjectURL(url);
   });
 
-  importInput.addEventListener('change', async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    try{
-      const text = await f.text();
+  /* -------- IMPORT -------- */
+  importInput?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
       const parsed = JSON.parse(text);
-      if(!Array.isArray(parsed.modules)) throw new Error('Formato inválido');
-      // merge or replace? we'll replace and set as new store
+
+      if (!Array.isArray(parsed.modules)) {
+        throw new Error('Formato inválido');
+      }
+
       state.modules = parsed.modules;
-      state.currentModuleId = state.modules[0] ? state.modules[0].id : null;
-      saveToStorage();
+      state.currentModuleId = state.modules[0]?.id ?? null;
+      state.dirty = true;
+
+      syncSaveButton();
       renderModuleList();
       renderCurrentModule();
-      importInput.value = '';
+
       alert('Importação concluída.');
-    }catch(err){
+    } catch (err) {
       alert('Falha ao importar: ' + err.message);
+    } finally {
+      importInput.value = '';
     }
   });
 
-  /* QUICK EDITS -> name & notes */
-  moduleNameInput.addEventListener('input', ()=>{
-    const mod = getCurrentModule();
-    if(!mod) return;
-    mod.name = moduleNameInput.value;
-    saveToStorage();
+  /* -------- QUICK EDITS -------- */
+  moduleNameInput?.addEventListener('input', () => {
+    const module = getCurrentModule();
+    if (!module) return;
+
+    module.name = moduleNameInput.value;
+    state.dirty = true;
+    syncSaveButton();
     renderModuleList();
   });
-  
-  moduleNotesInput.addEventListener('input', ()=>{
-    const mod = getCurrentModule();
-    if(!mod) return;
-    mod.notes = moduleNotesInput.value;
-    saveToStorage();
+
+  moduleNotesInput?.addEventListener('input', () => {
+    const module = getCurrentModule();
+    if (!module) return;
+
+    module.notes = moduleNotesInput.value;
+    state.dirty = true;
+    syncSaveButton();
   });
 
-  /* SEARCH */
-  moduleSearch.addEventListener('input', ()=> renderModuleList());
-  
-  quickSearch.addEventListener('input', ()=>{
-    // highlight marks with labels matching quick query
-    // This logic logic was partially moved to renderMarks to be consistent,
-    // but the input trigger is here.
-    renderMarks();
-  });
+  /* -------- SEARCH -------- */
+  moduleSearch?.addEventListener('input', renderModuleList);
+  quickSearch?.addEventListener('input', renderMarks);
 
-  /* keyboard delete */
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === 'Delete' || e.key === 'Backspace'){
-      // if a mark is focused? not tracking focused marks - skip
-    }
+  /* -------- UNSAVED WARNING -------- */
+  window.addEventListener('beforeunload', (e) => {
+    if (!state.dirty) return;
+    e.preventDefault();
+    e.returnValue = '';
   });
 }

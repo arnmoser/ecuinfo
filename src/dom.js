@@ -23,5 +23,6 @@ export const btnSave = document.getElementById('btn-save-mark');
 export const btnCancel = document.getElementById('btn-cancel-mark');
 export const btnCancelMark = document.getElementById('btn-cancel-mark');
 export const btnSaveMark = document.getElementById('btn-save-mark');
+export const btnSaveProject = document.getElementById('saveProjectBtn');
 // Elemento dinâmico para transformações
 export const getStageContent = () => document.getElementById('stageContent');

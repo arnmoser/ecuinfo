@@ -19,6 +19,7 @@ export const state = {
   scale: 1,
   translate: { x: 0, y: 0 },
 
+  dirty: false, // marca alterações não salvas 
   draggingImage: false,
   dragStart: null
 };
