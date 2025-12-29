@@ -480,3 +480,13 @@ body{
 .login-card button:active {
   transform: scale(0.98);
 }
+
+.project-selector {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.project-selector select {
+  width: 100%;
+  padding: 6px;
+}

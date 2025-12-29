@@ -77,3 +77,16 @@ export function clearStorage() {
     console.error('[storage] Erro ao limpar storage', err);
   }
 }
+
+// storage.js (adicione isso)
+const LAST_PROJECT_KEY = 'last_project_id';
+
+export function saveLastProjectId(projectId) {
+  if (projectId) {
+    localStorage.setItem(LAST_PROJECT_KEY, projectId);
+  }
+}
+
+export function loadLastProjectId() {
+  return localStorage.getItem(LAST_PROJECT_KEY);
+}

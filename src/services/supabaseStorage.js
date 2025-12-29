@@ -90,7 +90,6 @@ export async function listProjectsFromSupabase() {
 }
 
 /* =====================================================
-   DELETE (OPTIONAL, MAS LIMPO)
    ===================================================== */
 export async function deleteProjectFromSupabase(projectId) {
   if (!state.user) {
@@ -115,4 +114,75 @@ export async function deleteProjectFromSupabase(projectId) {
   if (state.currentProjectId === projectId) {
     state.currentProjectId = null;
   }
+}
+
+export async function getProjectsFromSupabase() {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, data, updated_at')
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    console.error('[supabase] Erro ao buscar projetos', error);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    state.modules = [];
+    state.currentModuleId = null;
+    return;
+  }
+
+  /**
+   * MVP assumption:
+   * - carrega o projeto mais recente
+   * - depois você pode permitir múltiplos projetos
+   */
+  const latestProject = data[0];
+  const payload = latestProject.payload;
+
+  // validação defensiva (igual ao storage)
+  state.modules = Array.isArray(payload?.modules)
+    ? payload.modules
+    : [];
+
+  state.currentModuleId =
+    state.modules[0]?.id ?? null;
+}
+
+export async function loadOrCreateUserProject() {
+  if (!state.user) {
+    throw new Error('Usuário não autenticado');
+  }
+
+  // 1️⃣ tenta carregar
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, data')
+    .eq('user_id', state.user.id)
+    .single();
+
+  // 2️⃣ existe → retorna
+  if (data) {
+    return data;
+  }
+
+  // 3️⃣ não existe → cria
+  const emptyPayload = {
+    version: 1,
+    modules: []
+  };
+
+  const { data: created, error: createError } = await supabase
+    .from('projects')
+    .insert({
+      user_id: state.user.id,
+      data: emptyPayload
+    })
+    .select('id, data')
+    .single();
+
+  if (createError) throw createError;
+
+  return created;
 }

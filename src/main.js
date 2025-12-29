@@ -1,33 +1,25 @@
 /* main.js - Boot + Auth Orchestration (CORRIGIDO) */
-
 import { supabase } from './services/supabase.js';
-
-import { loadFromStorage } from './storage.js';
 import { state } from './state.js';
-import { uid } from './utils.js';
-
 import {
   renderModuleList,
   renderCurrentModule
 } from './rendering.js';
-
 import {
   applyTransform,
   setupStagePanZoom
 } from './stage.js';
-
 import { setupMarkCreationEvents } from './marks.js';
 import { setupGlobalEvents } from './events.js';
-
-import { getProjects } from './services/projects.js';
 import {
   showLoginScreen,
   hideLoginScreen,
   setupLoginForm
 } from './ui-login.js';
-
 import { setupLogout } from './ui-logout.js';
-import { syncSaveButton } from './ui-modal.js';
+import { hydrateStateFromPayload } from './services/hydrate.js';
+import { loadOrCreateUserProject } from './services/supabaseStorage.js';
+
 
 /* =========================
    INTERNAL FLAGS
@@ -42,7 +34,6 @@ let appStarted = false;
 function resetStateOnLogout() {
   state.user = null;
 
-  state.projects = [];
   state.currentProjectId = null;
 
   state.modules = [];
@@ -61,27 +52,7 @@ function resetStateOnLogout() {
    UI INIT (NO AUTH LOGIC)
    ========================= */
 
-function initUI() {
-  loadFromStorage();
-
-  if (!state.modules.length) {
-    state.modules = [
-      {
-        id: uid('mod'),
-        name: 'Exemplo ECU',
-        notes:
-          'Clique em "Adicionar Foto" para carregar imagem.\n' +
-          'Use ferramenta Ponto/Texto para marcar.',
-        photo: '',
-        marks: []
-      }
-    ];
-
-    state.currentModuleId = state.modules[0].id;
-    state.dirty = true;
-    syncSaveButton();
-  }
-
+ function initUI() {
   document.getElementById('toolPoint')?.classList.add('active');
 
   renderModuleList();
@@ -93,26 +64,27 @@ function initUI() {
   setupMarkCreationEvents();
 }
 
+
 /* =========================
    APP START (AUTH OK)
    ========================= */
 
 async function startApp(user) {
-  if (appStarted) return;
-  appStarted = true;
-
   state.user = user;
 
   hideLoginScreen();
   setupLogout();
 
-  const { data: projects, error } = await getProjects();
-  if (!error) {
-    state.projects = projects || [];
-  }
+  const project = await loadOrCreateUserProject();
+
+  state.currentProjectId = project.id;
+
+  hydrateStateFromPayload(project.data);
 
   initUI();
 }
+
+
 
 /* =========================
    AUTH HANDLERS

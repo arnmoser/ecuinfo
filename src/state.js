@@ -6,7 +6,6 @@ export const state = {
      ====================== */
   user: null,
 
-  projects: [],
   currentProjectId: null,
 
   /* ======================
