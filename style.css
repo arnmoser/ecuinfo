@@ -490,3 +490,34 @@ body{
   width: 100%;
   padding: 6px;
 }
+
+.text-mark-rect {
+  position: absolute;
+  border: 2px dashed var(--accent);
+  background: rgba(0, 255, 127, 0.1);
+  border-radius: 8px;
+  pointer-events: auto;
+  transform: none !important;
+}
+
+.text-mark-rect .resize-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border: 2px solid #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.text-mark-rect .resize-handle.nw { top: 0; left: 0; cursor: nw-resize; }
+.text-mark-rect .resize-handle.ne { top: 0; right: 0; cursor: ne-resize; }
+.text-mark-rect .resize-handle.sw { bottom: 0; left: 0; cursor: sw-resize; }
+.text-mark-rect .resize-handle.se { bottom: 0; right: 0; cursor: se-resize; }
+
+.text-mark-rect:hover {
+  border-color: var(--accent-soft);
+  box-shadow: 0 0 12px rgba(0, 255, 127, 0.3);
+}

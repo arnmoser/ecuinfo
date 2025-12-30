@@ -7,6 +7,7 @@ import {
 import { saveToStorage } from './storage.js';
 import { deleteMark, editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
 import { syncSaveButton } from './ui-modal.js';
+import { setupTextMarkResize, startDragTextMark } from './marks.js';
 
 
 export function renderModuleList(){
@@ -65,75 +66,114 @@ export function renderMarks(){
   const q = quickSearch.value.trim().toLowerCase();
 
   (mod.marks||[]).forEach(mark=>{
-    const el = markTpl.content.firstElementChild.cloneNode(true);
-    const dot = el.querySelector('.dot');
-    const label = el.querySelector('.label');
-    const delBtn = el.querySelector('.mark-delete');
+  const el = markTpl.content.firstElementChild.cloneNode(true);
+  const dot = el.querySelector('.dot');
+  const label = el.querySelector('.label');
+  const delBtn = el.querySelector('.mark-delete');
 
+  // === DIFERENÇA AQUI: marks de texto são retângulos ===
+  if (mark.type === 'text') {
+    // Remove o dot (não queremos o círculo verde)
+    dot.remove();
+
+    // Configura o container como retângulo
+    el.classList.add('text-mark-rect');
+    el.style.left = `${(mark.x * 100)}%`;
+    el.style.top = `${(mark.y * 100)}%`;
+    el.style.width = `${(mark.width || 0.2) * 100}%`;
+    el.style.height = `${(mark.height || 0.15) * 100}%`;
+    el.style.transform = 'none'; // remove o translate(-50%,-50%) padrão
+
+    // Label fica dentro da caixa
+    label.textContent = mark.title || (mark.type === 'text' ? 'TEXTO' : mark.label || '');
+    label.style.position = 'absolute';
+    label.style.top = '4px';
+    label.style.left = '8px';
+    label.style.background = 'rgba(0,0,0,0.6)';
+    label.style.padding = '4px 8px';
+    label.style.borderRadius = '4px';
+    label.style.fontSize = '14px';
+    label.style.pointerEvents = 'none';
+
+    // Botão delete dentro da caixa
+    delBtn.style.position = 'absolute';
+    delBtn.style.top = '4px';
+    delBtn.style.right = '8px';
+    delBtn.style.background = 'rgba(255,0,0,0.7)';
+    delBtn.style.width = '20px';
+    delBtn.style.height = '20px';
+    delBtn.style.borderRadius = '50%';
+    delBtn.style.fontSize = '12px';
+
+    // Adiciona as 4 alças de redimensionamento
+    ['nw', 'ne', 'sw', 'se'].forEach(dir => {
+      const handle = document.createElement('div');
+      handle.className = `resize-handle ${dir}`;
+      handle.dataset.dir = dir;
+      el.appendChild(handle);
+    });
+
+  } else {
+    // === Marks de ponto (mantém exatamente como estava) ===
     dot.style.transform = `scale(${mark.size || 1})`;
-    // Atualiza o label: se for texto, mostra o título ou 'TEXT'
-    label.textContent = mark.label || (mark.type === 'text' ? (mark.title || 'TEXT') : '');
-
-    // position as percentage
+    label.textContent = mark.label || '';
     el.style.left = (mark.x*100) + '%';
     el.style.top = (mark.y*100) + '%';
-    el.dataset.markId = mark.id;
-    el.classList.toggle('text-mark', mark.type === 'text');
+  }
 
-    // =======================================================
-    // NOVO COMPORTAMENTO PARA MARCAS DE TEXTO (HOVER E CLICK)
-    // =======================================================
-    if (mark.type === 'text') {
-        // 1. Hover (Tooltip nativo): Exibe o título
-        el.title = mark.title || "Marca de Texto"; 
+  el.dataset.markId = mark.id;
 
-        // 2. Click para editar: Abre o menu de Título/Descrição
-        el.addEventListener('click', (e) => {
-            e.stopPropagation(); // Impede criar outro ponto
-            openTextMarkMenu(mark); // Chama a função importada
-        });
-        
-        // Impede que o dblclick abra o editor de label padrão em marcas de texto
-    } else {
-        el.addEventListener('dblclick', (ev)=>{
-            ev.stopPropagation();
-            editMarkLabel(mark, label);
-        });
-    }
-    // =======================================================
-    
-    // events (Mantenha os eventos de drag e zoom/delete)
-    dot.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+  // Eventos comuns
+  delBtn.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    deleteMark(mark.id);
+  });
 
-      const delta = e.deltaY < 0 ? 0.1 : -0.1;
-      mark.size = Math.max(0.3, Math.min(4, (mark.size || 1) + delta));
-
-      dot.style.transform = `scale(${mark.size})`;
-      state.dirty = true;
-      syncSaveButton();
-    }, { passive: false });
-
+  // Drag da mark inteira (apenas para texto: move o retângulo)
+  if (mark.type === 'text') {
+    el.addEventListener('mousedown', (ev) => {
+      if (ev.target.classList.contains('resize-handle')) return; // não drag se clicou na alça
+      if (ev.button !== 0) return;
+      ev.stopPropagation();
+      startDragTextMark(ev, mark, el);
+    });
+  } else {
+    // Drag do ponto antigo
     el.addEventListener('mousedown', (ev)=>{
       if(ev.button !== 0) return;
       ev.stopPropagation();
       startDragMark(ev, mark, el);
     });
-    
-    delBtn.addEventListener('click', (ev)=>{
-      ev.stopPropagation();
-      deleteMark(mark.id);
-    });
-    
-    // Quick Search visibility logic (CORRIGIDA PARA INCLUIR TITLE/DESCRIPTION)
-    if(q){
-       const matches = (mark.label||'').toLowerCase().includes(q) || 
-                       (mark.title||'').toLowerCase().includes(q) || 
-                       (mark.description||'').toLowerCase().includes(q); 
-       el.style.display = matches ? 'flex' : 'none';
-    }
 
-    marksLayer.appendChild(el);
-  });
+    // Zoom com scroll (só para pontos)
+    dot.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      mark.size = Math.max(0.3, Math.min(4, (mark.size || 1) + delta));
+      dot.style.transform = `scale(${mark.size})`;
+      state.dirty = true;
+      syncSaveButton();
+    }, { passive: false });
+  }
+
+  // Click para abrir modal (só texto)
+  if (mark.type === 'text') {
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('resize-handle') || e.target.classList.contains('mark-delete')) return;
+      e.stopPropagation();
+      openTextMarkMenu(mark);
+    });
+  }
+
+  // Filtro de busca
+  if(q){
+    const matches = (mark.label||'').toLowerCase().includes(q) || 
+                    (mark.title||'').toLowerCase().includes(q) || 
+                    (mark.description||'').toLowerCase().includes(q); 
+    el.style.display = matches ? 'flex' : 'none';
+  }
+
+  marksLayer.appendChild(el);
+});
 }
