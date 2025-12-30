@@ -1,125 +1,22 @@
-/* main.js - Boot + Auth Orchestration (CORRIGIDO) */
 import { supabase } from './services/supabase.js';
 import { state } from './state.js';
-import {
-  renderModuleList,
-  renderCurrentModule
-} from './rendering.js';
-import {
-  applyTransform,
-  setupStagePanZoom
-} from './stage.js';
-import { setupMarkCreationEvents } from './marks.js';
-import { setupGlobalEvents } from './events.js';
-import {
-  showLoginScreen,
-  hideLoginScreen,
-  setupLoginForm
-} from './ui-login.js';
+import { handleAuthEvent } from './authController.js';
+import { showLoginScreen, setupLoginForm } from './ui-login.js';
 import { setupLogout } from './ui-logout.js';
-import { hydrateStateFromPayload } from './services/hydrate.js';
-import { loadOrCreateUserProject } from './services/supabaseStorage.js';
-
-
-/* =========================
-   INTERNAL FLAGS
-   ========================= */
-
-let appStarted = false;
-
-/* =========================
-   STATE RESET (LOGOUT SAFE)
-   ========================= */
-
-function resetStateOnLogout() {
-  state.user = null;
-
-  state.currentProjectId = null;
-
-  state.modules = [];
-  state.currentModuleId = null;
-
-  state.tool = 'point';
-  state.scale = 1;
-  state.translate = { x: 0, y: 0 };
-
-  state.dirty = false;
-  state.draggingImage = false;
-  state.dragStart = null;
-}
-
-/* =========================
-   UI INIT (NO AUTH LOGIC)
-   ========================= */
-
- function initUI() {
-  document.getElementById('toolPoint')?.classList.add('active');
-
-  renderModuleList();
-  renderCurrentModule();
-  applyTransform();
-
-  setupGlobalEvents();
-  setupStagePanZoom();
-  setupMarkCreationEvents();
-}
-
-
-/* =========================
-   APP START (AUTH OK)
-   ========================= */
-
-async function startApp(user) {
-  state.user = user;
-
-  hideLoginScreen();
-  setupLogout();
-
-  const project = await loadOrCreateUserProject();
-
-  state.currentProjectId = project.id;
-
-  hydrateStateFromPayload(project.data);
-
-  initUI();
-}
-
-
-
-/* =========================
-   AUTH HANDLERS
-   ========================= */
-
-function handleAuthSession(session) {
-  if (session?.user) {
-    startApp(session.user);
-  } else {
-    appStarted = false;
-    resetStateOnLogout();
-    showLoginScreen();
-    setupLoginForm();
-  }
-}
-
-/* =========================
-   BOOTSTRAP
-   ========================= */
 
 function boot() {
-  // Reação a login/logout
-  supabase.auth.onAuthStateChange((_event, session) => {
-    handleAuthSession(session);
+  showLoginScreen();
+  setupLoginForm();
+
+  supabase.auth.onAuthStateChange((event, session) => {
+    handleAuthEvent(event, session);
   });
 
-  // Estado inicial (refresh / reload)
-  supabase.auth
-    .getSession()
-    .then(({ data }) => {
-      handleAuthSession(data.session);
-    })
-    .catch(() => {
-      handleAuthSession(null);
-    });
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      state.user = data.session.user;
+    }
+  });
 }
 
 boot();

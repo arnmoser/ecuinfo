@@ -1,25 +1,28 @@
 import { signInWithEmail } from './services/auth.js';
 
-// Mostra tela de login
+function getUI() {
+  return {
+    login: document.getElementById('login'),
+    app: document.getElementById('app')
+  };
+}
+
 export function showLoginScreen() {
-  if (!login || !app) {
-    console.error('[ui-login] #login ou #app não encontrados');
-    return;
-  }
+  const { login, app } = getUI();
+  if (!login || !app) return;
 
   login.classList.remove('hidden');
   app.classList.add('hidden');
 }
 
-
-// Esconde login
 export function hideLoginScreen() {
+  const { login, app } = getUI();
   if (!login || !app) return;
 
   login.classList.add('hidden');
   app.classList.remove('hidden');
 }
-// Lógica do formulário
+
 export function setupLoginForm() {
   const form = document.getElementById('loginForm');
   if (!form) return;
@@ -27,12 +30,8 @@ export function setupLoginForm() {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = form.email.value;
-    const password = form.password.value;
-
     try {
-      await signInWithEmail(email, password);
-      window.location.reload(); // simples e robusto
+      await signInWithEmail(form.email.value, form.password.value);
     } catch {
       alert('Email ou senha inválidos');
     }
