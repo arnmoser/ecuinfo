@@ -1,12 +1,5 @@
 import { supabase } from './supabase.js';
 
-// Retorna usuário atual (sessão existente)
-export async function getUser() {
-  const { data } = await supabase.auth.getUser();
-
-  // quando não existe sessão, data.user é null
-  return data?.user ?? null;
-}
 // LOGIN
 export async function signInWithEmail(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({
