@@ -155,19 +155,21 @@ export async function loadOrCreateUserProject() {
     throw new Error('Usuário não autenticado');
   }
 
-  // 1️⃣ tenta carregar
+  if (state.currentProjectId) {
+    return {
+      id: state.currentProjectId,
+      data: { modules: state.modules }
+    };
+  }
+
   const { data, error } = await supabase
     .from('projects')
     .select('id, data')
     .eq('user_id', state.user.id)
     .single();
 
-  // 2️⃣ existe → retorna
-  if (data) {
-    return data;
-  }
+  if (data) return data;
 
-  // 3️⃣ não existe → cria
   const emptyPayload = {
     version: 1,
     modules: []
