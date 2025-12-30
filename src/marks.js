@@ -18,13 +18,37 @@ export function addMarkAtClientXY(clientX, clientY, type='point'){
   const relX = (clientX - rect.left) / rect.width;
   const relY = (clientY - rect.top) / rect.height;
   if(relX < 0 || relX > 1 || relY < 0 || relY > 1) return;
-  
-  const newMark = {
+
+  let newMark;
+
+  if (type === 'text') {
+    newMark = {
+      id: uid('mk'),
+      type: 'text',
+      x: parseFloat(relX.toFixed(6)),
+      y: parseFloat(relY.toFixed(6)),
+      width: 0.20,
+      height: 0.15,
+      title: '',
+      description: '',
+      label: 'Clique Para Nomear'
+    };
+    mod.marks = mod.marks || [];
+    mod.marks.push(newMark);
+    state.dirty = true;
+    syncSaveButton();
+    renderMarks();
+    openTextMarkMenu(newMark);
+    return; // importante: sai da função aqui
+  }
+
+  // Caso padrão (point)
+  newMark = {
     id: uid('mk'),
-    type: type,
+    type: 'point',
     x: parseFloat(relX.toFixed(6)),
     y: parseFloat(relY.toFixed(6)),
-    label: type === 'text' ? 'Clique Para Nomear' : '',
+    label: '',
     title: '',       
     description: '', 
     size: 1 
@@ -35,11 +59,6 @@ export function addMarkAtClientXY(clientX, clientY, type='point'){
   state.dirty = true;
   syncSaveButton();
   renderMarks();
-
-  // Se for texto, abre o menu limpo
-  if (type === 'text') {
-    openTextMarkMenu(newMark);
-  }
 }
 
 /* --- FUNÇÃO LIMPA: Apenas lógica de controle --- */
@@ -167,3 +186,126 @@ export function setupMarkCreationEvents(){
     markPressStart = null;
   });
 }
+
+let currentResize = null;
+let currentDragText = null;
+
+export function startDragTextMark(ev, mark, el) {
+  ev.preventDefault();
+
+  const startX = ev.clientX;
+  const startY = ev.clientY;
+  const startXRel = mark.x;
+  const startYRel = mark.y;
+
+  const rect = stage.getBoundingClientRect();
+
+  const onMove = (e) => {
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+
+    const dx = deltaX / (rect.width * state.scale);
+    const dy = deltaY / (rect.height * state.scale);
+
+    let newX = startXRel + dx;
+    let newY = startYRel + dy;
+
+    // Limita para não sair da imagem
+    newX = Math.max(0, Math.min(1 - mark.width, newX));
+    newY = Math.max(0, Math.min(1 - mark.height, newY));
+
+    el.style.left = (newX * 100) + '%';
+    el.style.top = (newY * 100) + '%';
+    mark.x = parseFloat(newX.toFixed(6));
+    mark.y = parseFloat(newY.toFixed(6));
+  };
+
+  const onUp = () => {
+    state.dirty = true;
+    syncSaveButton();
+    window.removeEventListener('mousemove', onMove);
+    window.removeEventListener('mouseup', onUp);
+  };
+
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+}
+
+// Redimensionamento com alças
+// Redimensionamento com alças - VERSÃO CORRIGIDA PARA ZOOM
+export function setupTextMarkResize() {
+  marksLayer.addEventListener('mousedown', (e) => {
+    if (!e.target.classList.contains('resize-handle')) return;
+    e.stopPropagation();
+
+    const handle = e.target;
+    const el = handle.parentElement;
+    const mod = getCurrentModule();
+    if (!mod) return;
+    const mark = mod.marks.find(m => m.id === el.dataset.markId);
+    if (!mark || mark.type !== 'text') return;
+
+    const dir = handle.dataset.dir; // nw, ne, sw, se
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+
+    // Valores iniciais da mark (em coordenadas relativas 0-1)
+    const startXRel = mark.x;
+    const startYRel = mark.y;
+    const startWidthRel = mark.width;
+    const startHeightRel = mark.height;
+
+    // Pega o bounding rect do stage (área visível)
+    const rect = stage.getBoundingClientRect();
+
+    const onMove = (e) => {
+      // Deslocamento em pixels na tela
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
+
+      // Converte para coordenadas relativas ao conteúdo, considerando o scale atual
+      const dx = deltaX / (rect.width * state.scale);
+      const dy = deltaY / (rect.height * state.scale);
+
+      let newX = startXRel;
+      let newY = startYRel;
+      let newW = startWidthRel;
+      let newH = startHeightRel;
+
+      if (dir.includes('e')) newW += dx;        // direita
+      if (dir.includes('w')) { newW -= dx; newX += dx; } // esquerda
+      if (dir.includes('s')) newH += dy;        // baixo
+      if (dir.includes('n')) { newH -= dy; newY += dy; } // cima
+
+      // Limites mínimos e máximos (em fração da imagem)
+      newW = Math.max(0.08, Math.min(1, newW));
+      newH = Math.max(0.06, Math.min(1, newH));
+      newX = Math.max(0, Math.min(1 - newW, newX));
+      newY = Math.max(0, Math.min(1 - newH, newY));
+
+      // Atualiza o elemento visual
+      el.style.left = (newX * 100) + '%';
+      el.style.top = (newY * 100) + '%';
+      el.style.width = (newW * 100) + '%';
+      el.style.height = (newH * 100) + '%';
+
+      // Atualiza os dados da mark
+      mark.x = parseFloat(newX.toFixed(6));
+      mark.y = parseFloat(newY.toFixed(6));
+      mark.width = parseFloat(newW.toFixed(6));
+      mark.height = parseFloat(newH.toFixed(6));
+    };
+
+    const onUp = () => {
+      state.dirty = true;
+      syncSaveButton();
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+  });
+}
+setupTextMarkResize();
