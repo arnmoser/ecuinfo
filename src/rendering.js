@@ -5,10 +5,9 @@ import {
   moduleNotesInput, stageImg, marksLayer, markTpl, quickSearch 
 } from './dom.js';
 import { saveToStorage } from './storage.js';
-import { deleteMark, editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
+import {  editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
 import { syncSaveButton } from './ui-modal.js';
 import { setupTextMarkResize, startDragTextMark } from './marks.js';
-
 
 export function renderModuleList(){
   const q = moduleSearch.value.trim().toLowerCase();
@@ -69,7 +68,6 @@ export function renderMarks(){
   const el = markTpl.content.firstElementChild.cloneNode(true);
   const dot = el.querySelector('.dot');
   const label = el.querySelector('.label');
-  const delBtn = el.querySelector('.mark-delete');
 
   // === DIFERENÇA AQUI: marks de texto são retângulos ===
   if (mark.type === 'text') {
@@ -85,7 +83,8 @@ export function renderMarks(){
     el.style.transform = 'none'; // remove o translate(-50%,-50%) padrão
 
     // Label fica dentro da caixa
-    label.textContent = mark.title || (mark.type === 'text' ? 'TEXTO' : mark.label || '');
+    label.textContent = mark.title || 'Sem título';
+    label.classList.add('text-mark-label');
     label.style.position = 'absolute';
     label.style.top = '4px';
     label.style.left = '8px';
@@ -95,16 +94,7 @@ export function renderMarks(){
     label.style.fontSize = '14px';
     label.style.pointerEvents = 'none';
 
-    // Botão delete dentro da caixa
-    delBtn.style.position = 'absolute';
-    delBtn.style.top = '4px';
-    delBtn.style.right = '8px';
-    delBtn.style.background = 'rgba(255,0,0,0.7)';
-    delBtn.style.width = '20px';
-    delBtn.style.height = '20px';
-    delBtn.style.borderRadius = '50%';
-    delBtn.style.fontSize = '12px';
-
+   
     // Adiciona as 4 alças de redimensionamento
     ['nw', 'ne', 'sw', 'se'].forEach(dir => {
       const handle = document.createElement('div');
@@ -123,11 +113,7 @@ export function renderMarks(){
 
   el.dataset.markId = mark.id;
 
-  // Eventos comuns
-  delBtn.addEventListener('click', (ev)=>{
-    ev.stopPropagation();
-    deleteMark(mark.id);
-  });
+  
 
   // Drag da mark inteira (apenas para texto: move o retângulo)
   if (mark.type === 'text') {
