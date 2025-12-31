@@ -3,13 +3,16 @@ import { state, getCurrentModule } from './state.js';
 import { stage, marksLayer } from './dom.js';
 import { uid } from './utils.js';
 import { renderMarks } from './rendering.js';
-import { MARK_HOLD_TIME } from './constants.js';
+import { MARK_HOLD_TIME, HOLD_MOVE_TOLERANCE } from './constants.js';
 import { modalOverlay, titleInput, descInput, btnSaveMark, btnCancelMark } from './dom.js';
 import { syncSaveButton } from './ui-modal.js';
+import { btnDeleteMark } from './dom.js';
+
 
 let markPressTimer = null;
 let markPressStart = null;
 let currentDrag = null;
+let activeMark = null;
 
 export function addMarkAtClientXY(clientX, clientY, type='point'){
   const mod = getCurrentModule();
@@ -66,6 +69,7 @@ export function openTextMarkMenu(mark) {
     // 1. Preenche os inputs com os dados atuais da mark
     titleInput.value = mark.title || '';
     descInput.value = mark.description || '';
+    activeMark = mark;
 
     // 2. Define o que acontece ao clicar em SALVAR
     // Usamos .onclick para sobrescrever qualquer handler anterior e evitar duplicação
@@ -85,6 +89,19 @@ export function openTextMarkMenu(mark) {
     btnCancelMark.onclick = () => {
         closeModal();
     };
+
+
+    btnDeleteMark.onclick = () => {
+  const confirmed = confirm(
+    'Tem certeza que deseja deletar esta marcação?\nEssa ação não pode ser desfeita.'
+  );
+
+  if (!confirmed) return;
+
+  deleteMark(mark.id);
+  closeModal();
+    };
+
 
     // 4. Mostra o modal (remove a classe hidden)
     modalOverlay.classList.remove('hidden');
@@ -159,33 +176,54 @@ function endDragMark(){
   window.removeEventListener('mouseup', endDragMark);
 }
 
-export function setupMarkCreationEvents(){
-  /* STAGE CLICK -> add mark */
+export function setupMarkCreationEvents() {
+  let isHolding = false;
+
   stage.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return; // só botão esquerdo
+    if (e.button !== 0) return;
+    if (e.target.closest('.mark')) return;
 
     const mod = getCurrentModule();
     if (!mod || !mod.photo) return;
 
-    // não criar mark se clicou em mark existente
-    if (e.target.closest('.mark')) return;
-
+    isHolding = true;
     markPressStart = { x: e.clientX, y: e.clientY };
 
     markPressTimer = setTimeout(() => {
+      if (!isHolding) return;
+
       addMarkAtClientXY(e.clientX, e.clientY, state.tool);
+
+      isHolding = false;
       markPressTimer = null;
     }, MARK_HOLD_TIME);
   });
 
-  stage.addEventListener('mouseup', () => {
+  stage.addEventListener('mousemove', (e) => {
+    if (!isHolding || !markPressStart) return;
+
+    const dx = Math.abs(e.clientX - markPressStart.x);
+    const dy = Math.abs(e.clientY - markPressStart.y);
+
+    if (dx > HOLD_MOVE_TOLERANCE || dy > HOLD_MOVE_TOLERANCE) {
+      cancelHold();
+    }
+  });
+
+  stage.addEventListener('mouseup', cancelHold);
+  stage.addEventListener('mouseleave', cancelHold);
+
+  function cancelHold() {
+    isHolding = false;
+    markPressStart = null;
+
     if (markPressTimer) {
       clearTimeout(markPressTimer);
       markPressTimer = null;
     }
-    markPressStart = null;
-  });
+  }
 }
+
 
 let currentResize = null;
 let currentDragText = null;

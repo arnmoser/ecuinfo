@@ -4,7 +4,7 @@
   --muted:#0044ff;
   --accent:#00ff7f;     /* neon green */
   --accent-soft:#0aff87;
-  --danger:#ff3b3b;
+  --danger:#e80000;
   --shadow:0 8px 20px rgba(0,255,150,0.08);
   --radius:12px;
 
@@ -197,7 +197,7 @@ body{
 }
 .danger{
   background:var(--danger);
-  color:white;
+  color:rgb(244, 244, 244);
   border:0;
   padding:8px 12px;
   border-radius:8px;
@@ -280,15 +280,6 @@ body{
   white-space:nowrap;
   color:#e5e5e5;
 }
-.mark .mark-delete{
-  margin-left:6px;
-  background:transparent;
-  border:0;
-  color:#999;
-  cursor:pointer;
-  font-size:13px;
-}
-.mark .mark-delete:hover{color:#fff}
 
 .mark.dragging{
   opacity:0.8;
@@ -307,28 +298,6 @@ body{
   #app{flex-direction:column; padding:12px;}
   .sidebar,.module-info{display:none}
   .stage-wrap{min-height:60vh}
-}
-
-/* UI-Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.modal {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  min-width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,.1);
 }
 
 /* Utilitário para esconder elementos */
@@ -355,7 +324,7 @@ body{
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 300px;
+  width: 350px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -390,27 +359,97 @@ body{
 /* Botões */
 .modal-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
   gap: 10px;
 }
 
 .btn-primary {
-  background-color: #007bff;
-  color: white;
+  background: linear-gradient(135deg, #2563EB, #1D4ED8);
+  color: #ffffff;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 10px 20px;
+  border-radius: 10px;
   cursor: pointer;
+  
+
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  transition:
+    background 0.25s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 }
 
-.btn-secondary {
-  background-color: #ccc;
-  color: #333;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
+/* Hover */
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
 }
+
+/* Active (clique) */
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* Focus (acessibilidade) */
+.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
+}
+
+/* Disabled */
+.btn-primary:disabled {
+  background: #93C5FD;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* Excluir (destrutivo) */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 10px 20px;
+
+
+  background-color:#DC2626;
+  color:#ffffff;
+  border:none;
+  cursor:pointer;
+  font-weight:500;
+}
+
+.btn-secondary:hover {
+  background-color: #B91C1C;
+}
+
+/* Cancelar (neutro e discreto) */
+.btn-neutral {
+  background-color: transparent;
+  color: #374151;
+  border: 1px solid #D1D5DB;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-neutral:hover {
+  background-color: #F3F4F6;
+  border-color: #9CA3AF;
+}
+
 
 /* ===== LOGIN ===== */
 
@@ -502,8 +541,8 @@ body{
 
 .text-mark-rect .resize-handle {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 8px;
+  height: 8px;
   background: var(--accent);
   border: 2px solid #000;
   border-radius: 50%;
@@ -520,4 +559,20 @@ body{
 .text-mark-rect:hover {
   border-color: var(--accent-soft);
   box-shadow: 0 0 12px rgba(0, 255, 127, 0.3);
+}
+
+/* === TEXT MARK LABEL (HOVER ONLY) === */
+
+.text-mark-rect .label {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  pointer-events: none;
+}
+
+.text-mark-rect:hover .label {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
