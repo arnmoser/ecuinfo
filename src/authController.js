@@ -6,11 +6,11 @@ import { initUI } from './main-ui.js';
 import { setupLogout } from './ui-logout.js';
 
 export async function handleAuthEvent(event, session) {
-  if (event === 'SIGNED_OUT') {
-    resetState();
-    showLoginScreen();
-    return;
-  }
+ if (event === 'SIGNED_OUT' || !session) {
+  resetState();
+  showLoginScreen();
+  return;
+}
 
   if (event !== 'SIGNED_IN') return;
 
@@ -18,6 +18,7 @@ export async function handleAuthEvent(event, session) {
 }
 
 async function bootstrapUser(session) {
+  if (!session?.user) return;
   if (state.bootstrapped || state.booting) return;
 
   state.booting = true;

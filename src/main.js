@@ -12,11 +12,6 @@ function boot() {
     handleAuthEvent(event, session);
   });
 
-  supabase.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      state.user = data.session.user;
-    }
-  });
 }
 
 boot();
