@@ -4,6 +4,8 @@ import { hydrateStateFromPayload } from './services/hydrate.js';
 import { hideLoginScreen, showLoginScreen } from './ui-login.js';
 import { initUI } from './main-ui.js';
 import { setupLogout } from './ui-logout.js';
+import { loadAccount } from './services/accountService.js';
+
 
 export async function handleAuthEvent(event, session) {
  if (event === 'SIGNED_OUT' || !session) {
@@ -27,15 +29,18 @@ async function bootstrapUser(session) {
   try {
     hideLoginScreen();
 
+    state.account = await loadAccount(session.user.id);
+
     const project = await loadOrCreateUserProject();
     state.currentProjectId = project.id;
 
     hydrateStateFromPayload(project.data);
     initUI();
-    setupLogout(); // ← AQUI, NO MOMENTO CERTO
+    setupLogout();
 
     state.bootstrapped = true;
   } finally {
     state.booting = false;
   }
 }
+

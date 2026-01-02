@@ -3,6 +3,8 @@
 export const state = {
   user: null,
 
+  account: null, 
+
   currentProjectId: null,
 
   modules: [],
@@ -17,11 +19,9 @@ export const state = {
   draggingImage: false,
   dragStart: null,
 
-  // 🔒 CONTROLE DE BOOT
   bootstrapped: false,
   booting: false
 };
-
 
 /* ======================
    GETTERS AUXILIARES
@@ -34,8 +34,9 @@ export function getCurrentModule() {
 
 export function resetState() {
   state.user = null;
-  state.currentProjectId = null;
+  state.account = null;
 
+  state.currentProjectId = null;
   state.modules = [];
   state.currentModuleId = null;
 
@@ -47,7 +48,18 @@ export function resetState() {
   state.draggingImage = false;
   state.dragStart = null;
 
-  // ⚠️ CRÍTICO
   state.booting = false;
   state.bootstrapped = false;
 }
+
+
+state.account = {
+  status: 'demo' | 'active' | 'expired',
+  demo_expires_at: null,
+  ecuPacks: [],
+  usage: {
+    projects: 0,
+    uploads: 0,
+    comparisons: 0
+  }
+};

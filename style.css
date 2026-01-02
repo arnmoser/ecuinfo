@@ -484,6 +484,29 @@ body{
   color: #111;
 }
 
+.login-card .form-subtitle {
+  margin: -8px 0 8px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-card .form-toggle-link {
+  margin: 12px 0 -8px;
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+}
+
+.login-card .form-toggle-link a {
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-card .form-toggle-link a:hover {
+  text-decoration: underline;
+}
+
 .login-card input {
   height: 44px;
   padding: 0 12px;
