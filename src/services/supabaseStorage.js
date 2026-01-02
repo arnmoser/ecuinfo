@@ -33,7 +33,9 @@ export async function saveProjectToSupabase(payload) {
     .single();
 
   if (error) {
-    throw error;
+  const handled = await handleSupabaseError(error);
+  if (handled) return; // interrompe fluxo
+  throw error;
   }
 
   // Sincroniza ID local com o banco
@@ -62,7 +64,9 @@ export async function loadProjectFromSupabase(projectId) {
     .single();
 
   if (error) {
-    throw error;
+  const handled = await handleSupabaseError(error);
+  if (handled) return; // interrompe fluxo
+  throw error;
   }
 
   return data?.data ?? null;
@@ -83,7 +87,9 @@ export async function listProjectsFromSupabase() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    throw error;
+  const handled = await handleSupabaseError(error);
+  if (handled) return; // interrompe fluxo
+  throw error;
   }
 
   return data ?? [];
@@ -107,7 +113,9 @@ export async function deleteProjectFromSupabase(projectId) {
     .eq('user_id', state.user.id);
 
   if (error) {
-    throw error;
+  const handled = await handleSupabaseError(error);
+  if (handled) return; // interrompe fluxo
+  throw error;
   }
 
   // Limpa estado se apagou o projeto atual
@@ -123,8 +131,9 @@ export async function getProjectsFromSupabase() {
     .order('updated_at', { ascending: false });
 
   if (error) {
-    console.error('[supabase] Erro ao buscar projetos', error);
-    throw error;
+    const handled = await handleSupabaseError(error);
+  if (handled) return;
+  throw error;
   }
 
   if (!data || data.length === 0) {
@@ -139,7 +148,7 @@ export async function getProjectsFromSupabase() {
    * - depois você pode permitir múltiplos projetos
    */
   const latestProject = data[0];
-  const payload = latestProject.payload;
+  const payload = latestProject.data;
 
   // validação defensiva (igual ao storage)
   state.modules = Array.isArray(payload?.modules)
@@ -168,6 +177,12 @@ export async function loadOrCreateUserProject() {
     .eq('user_id', state.user.id)
     .single();
 
+  if (error) {
+  const handled = await handleSupabaseError(error);
+  if (handled) return;
+  throw error;
+}
+
   if (data) return data;
 
   const emptyPayload = {
@@ -187,4 +202,15 @@ export async function loadOrCreateUserProject() {
   if (createError) throw createError;
 
   return created;
+}
+
+async function handleSupabaseError(error) {
+  if (
+    error?.name === 'AuthApiError' ||
+    error?.code === 'PGRST301' // sessão expirada
+  ) {
+    await supabase.auth.signOut();
+    return true;
+  }
+  return false;
 }
