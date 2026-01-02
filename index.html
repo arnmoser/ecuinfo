@@ -13,14 +13,35 @@
 
   <!-- LOGIN -->
 <div id="login" class="login-wrapper hidden">
+  <!-- FORMULÁRIO DE LOGIN -->
   <form id="loginForm" class="login-card">
     <h2>Acessar o ECU Info</h2>
-    <h3>Por favor, digite seu Email e Senha</h3>
+    <p class="form-subtitle">Por favor, digite seu Email e Senha</p>
 
     <input type="email" name="email" placeholder="Email" required />
     <input type="password" name="password" placeholder="Senha" required />
 
     <button type="submit">Entrar</button>
+
+    <p class="form-toggle-link">
+      Não possui uma conta? <a href="#" id="showRegister">Crie uma agora</a>
+    </p>
+  </form>
+
+  <!-- FORMULÁRIO DE REGISTRO (começa escondido) -->
+  <form id="registerForm" class="login-card hidden">
+    <h2>Criar Nova Conta</h2>
+    <p class="form-subtitle">É rápido e fácil, comece seu teste de 7 dias.</p>
+
+    <input type="email" name="email" placeholder="Seu melhor email" required />
+    <input type="password" name="password" placeholder="Crie uma senha" required />
+    <input type="password" name="passwordConfirm" placeholder="Confirme a senha" required />
+
+    <button type="submit">Criar Conta</button>
+
+    <p class="form-toggle-link">
+      Já possui uma conta? <a href="#" id="showLogin">Faça o login</a>
+    </p>
   </form>
 </div>
 

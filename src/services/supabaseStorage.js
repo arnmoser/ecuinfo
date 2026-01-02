@@ -4,42 +4,87 @@ import { supabase } from './supabase.js';
 import { state } from '../state.js';
 
 /* =====================================================
-   SAVE (CREATE / UPDATE)
+   INTERNAL HELPERS
    ===================================================== */
-export async function saveProjectToSupabase(payload) {
+
+function ensureAuth() {
   if (!state.user) {
     throw new Error('Usuário não autenticado');
   }
+}
 
-  if (!payload) {
-    throw new Error('Payload inválido');
+function normalizePayload(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return { version: 1, modules: [] };
   }
 
-  const project = {
-    user_id: state.user.id,
-    name: state.currentProjectName ?? 'Projeto sem nome',
-    data: payload
+  return {
+    version: payload.version ?? 1,
+    modules: Array.isArray(payload.modules)
+      ? payload.modules
+      : []
   };
+}
 
-  // Atualização: envia ID existente
-  if (state.currentProjectId) {
-    project.id = state.currentProjectId;
+async function handleSupabaseError(error) {
+  if (
+    error?.name === 'AuthApiError' ||
+    error?.code === 'PGRST301'
+  ) {
+    await supabase.auth.signOut();
+    return true;
+  }
+  return false;
+}
+
+/* =====================================================
+   SAVE (CREATE / UPDATE)
+   ===================================================== */
+export async function saveProjectToSupabase(payload) {
+  ensureAuth();
+
+  const dataPayload = normalizePayload(payload);
+  const name = state.currentProjectName ?? 'Projeto sem nome';
+
+  // CREATE
+  if (!state.currentProjectId) {
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({
+        user_id: state.user.id,
+        name,
+        data: dataPayload
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      const handled = await handleSupabaseError(error);
+      if (handled) return;
+      throw error;
+    }
+
+    state.currentProjectId = data.id;
+    return data.id;
   }
 
+  // UPDATE
   const { data, error } = await supabase
     .from('projects')
-    .upsert(project, { onConflict: 'id' })
+    .update({
+      name,
+      data: dataPayload,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', state.currentProjectId)
     .select('id')
     .single();
 
   if (error) {
-  const handled = await handleSupabaseError(error);
-  if (handled) return; // interrompe fluxo
-  throw error;
+    const handled = await handleSupabaseError(error);
+    if (handled) return;
+    throw error;
   }
-
-  // Sincroniza ID local com o banco
-  state.currentProjectId = data.id;
 
   return data.id;
 }
@@ -48,59 +93,50 @@ export async function saveProjectToSupabase(payload) {
    LOAD (BY ID)
    ===================================================== */
 export async function loadProjectFromSupabase(projectId) {
-  if (!state.user) {
-    throw new Error('Usuário não autenticado');
-  }
+  ensureAuth();
 
-  if (!projectId) {
-    return null;
-  }
+  if (!projectId) return null;
 
   const { data, error } = await supabase
     .from('projects')
     .select('data')
     .eq('id', projectId)
-    .eq('user_id', state.user.id)
     .single();
 
   if (error) {
-  const handled = await handleSupabaseError(error);
-  if (handled) return; // interrompe fluxo
-  throw error;
+    const handled = await handleSupabaseError(error);
+    if (handled) return null;
+    throw error;
   }
 
-  return data?.data ?? null;
+  return normalizePayload(data?.data);
 }
 
 /* =====================================================
    LIST (USER PROJECTS)
    ===================================================== */
 export async function listProjectsFromSupabase() {
-  if (!state.user) {
-    throw new Error('Usuário não autenticado');
-  }
+  ensureAuth();
 
   const { data, error } = await supabase
     .from('projects')
     .select('id, name, created_at')
-    .eq('user_id', state.user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
-  const handled = await handleSupabaseError(error);
-  if (handled) return; // interrompe fluxo
-  throw error;
+    const handled = await handleSupabaseError(error);
+    if (handled) return [];
+    throw error;
   }
 
   return data ?? [];
 }
 
 /* =====================================================
+   DELETE
    ===================================================== */
 export async function deleteProjectFromSupabase(projectId) {
-  if (!state.user) {
-    throw new Error('Usuário não autenticado');
-  }
+  ensureAuth();
 
   if (!projectId) {
     throw new Error('ID do projeto inválido');
@@ -109,60 +145,59 @@ export async function deleteProjectFromSupabase(projectId) {
   const { error } = await supabase
     .from('projects')
     .delete()
-    .eq('id', projectId)
-    .eq('user_id', state.user.id);
-
-  if (error) {
-  const handled = await handleSupabaseError(error);
-  if (handled) return; // interrompe fluxo
-  throw error;
-  }
-
-  // Limpa estado se apagou o projeto atual
-  if (state.currentProjectId === projectId) {
-    state.currentProjectId = null;
-  }
-}
-
-export async function getProjectsFromSupabase() {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('id, data, updated_at')
-    .order('updated_at', { ascending: false });
+    .eq('id', projectId);
 
   if (error) {
     const handled = await handleSupabaseError(error);
-  if (handled) return;
-  throw error;
+    if (handled) return;
+    throw error;
+  }
+
+  if (state.currentProjectId === projectId) {
+    state.currentProjectId = null;
+    state.modules = [];
+    state.currentModuleId = null;
+  }
+}
+
+/* =====================================================
+   LOAD MOST RECENT (MVP)
+   ===================================================== */
+export async function getProjectsFromSupabase() {
+  ensureAuth();
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select('id, data, updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    const handled = await handleSupabaseError(error);
+    if (handled) return;
+    throw error;
   }
 
   if (!data || data.length === 0) {
     state.modules = [];
     state.currentModuleId = null;
+    state.currentProjectId = null;
     return;
   }
 
-  /**
-   * MVP assumption:
-   * - carrega o projeto mais recente
-   * - depois você pode permitir múltiplos projetos
-   */
   const latestProject = data[0];
-  const payload = latestProject.data;
+  const payload = normalizePayload(latestProject.data);
 
-  // validação defensiva (igual ao storage)
-  state.modules = Array.isArray(payload?.modules)
-    ? payload.modules
-    : [];
-
-  state.currentModuleId =
-    state.modules[0]?.id ?? null;
+  state.currentProjectId = latestProject.id;
+  state.modules = payload.modules;
+  state.currentModuleId = state.modules[0]?.id ?? null;
 }
 
+/* =====================================================
+   LOAD OR CREATE (LEGACY COMPAT)
+   ===================================================== */
 export async function loadOrCreateUserProject() {
-  if (!state.user) {
-    throw new Error('Usuário não autenticado');
-  }
+  ensureAuth();
 
   if (state.currentProjectId) {
     return {
@@ -174,21 +209,22 @@ export async function loadOrCreateUserProject() {
   const { data, error } = await supabase
     .from('projects')
     .select('id, data')
-    .eq('user_id', state.user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .single();
 
-  if (error) {
-  const handled = await handleSupabaseError(error);
-  if (handled) return;
-  throw error;
-}
+  if (error && error.code !== 'PGRST116') {
+    const handled = await handleSupabaseError(error);
+    if (handled) return;
+    throw error;
+  }
 
-  if (data) return data;
+  if (data) {
+    state.currentProjectId = data.id;
+    return data;
+  }
 
-  const emptyPayload = {
-    version: 1,
-    modules: []
-  };
+  const emptyPayload = { version: 1, modules: [] };
 
   const { data: created, error: createError } = await supabase
     .from('projects')
@@ -201,16 +237,6 @@ export async function loadOrCreateUserProject() {
 
   if (createError) throw createError;
 
+  state.currentProjectId = created.id;
   return created;
-}
-
-async function handleSupabaseError(error) {
-  if (
-    error?.name === 'AuthApiError' ||
-    error?.code === 'PGRST301' // sessão expirada
-  ) {
-    await supabase.auth.signOut();
-    return true;
-  }
-  return false;
 }
