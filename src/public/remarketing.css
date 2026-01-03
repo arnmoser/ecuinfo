@@ -52,9 +52,9 @@ h1, h2, h3, h4 {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 10% 20%, rgba(34,197,94,0.18), transparent 60%),
-    radial-gradient(circle at 90% 80%, rgba(22,163,74,0.15), transparent 65%),
-    linear-gradient(to bottom, var(--bg-dark), #030303);
+    radial-gradient(circle at 10% 20%, rgba(34,197,94,0.22), transparent 60%),
+    radial-gradient(circle at 90% 80%, rgba(22,163,74,0.18), transparent 65%),
+    linear-gradient(to bottom, var(--bg-dark), #020202);
   z-index: -1;
 }
 
@@ -63,11 +63,11 @@ h1, h2, h3, h4 {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(ellipse, black 45%, transparent 85%);
-  opacity: 0.7;
+    linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse, black 50%, transparent 90%);
+  opacity: 0.6;
 }
 
 .hero-layout {
@@ -85,10 +85,10 @@ h1, h2, h3, h4 {
   letter-spacing: 1.5px;
   padding: 10px 20px;
   border-radius: 999px;
-  border: 1px solid rgba(34,197,94,0.35);
+  border: 1px solid rgba(34,197,94,0.4);
   color: var(--green-accent);
   margin-bottom: 32px;
-  background: rgba(34,197,94,0.08);
+  background: rgba(34,197,94,0.1);
 }
 
 .hero-section h1 {
@@ -124,24 +124,12 @@ h1, h2, h3, h4 {
 .cta-button.primary {
   background: var(--green-primary);
   color: var(--text-white);
-  box-shadow: 0 6px 16px rgba(34,197,94,0.25);
+  box-shadow: 0 6px 16px rgba(34,197,94,0.3);
 }
 
 .cta-button.primary:hover {
   background: var(--green-accent);
-  box-shadow: 0 8px 24px rgba(34,197,94,0.45);
-  transform: translateY(-3px);
-}
-
-.cta-button.ghost {
-  border: 1px solid var(--border);
-  color: var(--text-white);
-}
-
-.cta-button.ghost:hover {
-  border-color: var(--green-primary);
-  color: var(--green-accent);
-  background: rgba(34,197,94,0.12);
+  box-shadow: 0 8px 24px rgba(34,197,94,0.5);
   transform: translateY(-3px);
 }
 
@@ -307,137 +295,91 @@ h1, h2, h3, h4 {
   color: var(--text-muted);
 }
 
-/* FEATURES */
+/* PLANS */
 
-.features-section {
+.plans-section {
   padding: 160px 0;
+  background: radial-gradient(circle at center, #0f172a 0%, var(--bg-dark) 100%);
 }
 
-.section-header {
-  text-align: center;
-  margin-bottom: 80px;
-}
-
-.section-header h2 {
-  font-size: clamp(2.5rem, 4.5vw, 3.5rem);
-  margin-bottom: 20px;
-}
-
-.section-header p {
-  max-width: 800px;
-  margin: 0 auto;
-  font-size: 1.15rem;
-  color: var(--text-muted);
-}
-
-.features-grid {
+.plans-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 40px;
 }
 
-.feature-card {
-  background: linear-gradient(180deg, var(--bg-card), #0d0d0d);
+.plan-card {
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 48px 36px;
+  text-align: center;
   transition: var(--transition);
   position: relative;
-  overflow: hidden;
 }
 
-.feature-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 5px;
-  background: linear-gradient(90deg, var(--green-primary), var(--green-accent));
-  transform: scaleX(0);
-  transition: var(--transition);
-}
-
-.feature-card:hover::before {
-  transform: scaleX(1);
-}
-
-.feature-card:hover {
-  border-color: var(--green-primary);
+.plan-card:hover {
   transform: translateY(-10px);
   box-shadow: 0 28px 56px var(--shadow);
+  border-color: var(--green-primary);
 }
 
-.feature-icon {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: var(--green-primary);
+.recommended-badge {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--green-accent);
+  color: var(--bg-dark);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
-.feature-card h3 {
-  font-size: 1.5rem;
+.plan-card h3 {
+  font-size: 1.8rem;
   margin-bottom: 16px;
 }
 
-.feature-card p {
-  font-size: 1.05rem;
-  color: var(--text-muted);
-}
-
-/* WORKFLOW */
-
-.workflow-section {
-  padding: 160px 0;
-  border-top: 1px solid #18181b;
-  background: linear-gradient(to bottom, var(--bg-dark), #060606);
-}
-
-.workflow {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 56px;
-}
-
-.workflow-step {
-  position: relative;
-  padding: 28px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.workflow-step:hover {
-  transform: translateY(-6px);
-  border-color: var(--green-primary);
-  box-shadow: 0 12px 24px var(--shadow);
-}
-
-.step-number {
-  font-size: 7rem;
+.price {
+  font-size: 2.5rem;
   font-weight: 800;
-  color: rgba(255,255,255,0.025);
-  position: absolute;
-  top: -40px;
-  left: 20px;
+  color: var(--green-primary);
+  margin-bottom: 32px;
 }
 
-.workflow-step h4 {
-  font-size: 1.4rem;
-  margin-bottom: 12px;
-}
-
-.workflow-step p {
+.price span {
+  font-size: 1.2rem;
+  font-weight: 400;
   color: var(--text-muted);
-  font-size: 1.05rem;
+}
+
+.plan-features {
+  list-style: none;
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+.plan-features li {
+  margin-bottom: 12px;
+  position: relative;
+  padding-left: 28px;
+}
+
+.plan-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--green-primary);
+  font-weight: bold;
 }
 
 /* TESTIMONIALS */
 
 .testimonials-section {
   padding: 160px 0;
-  background: radial-gradient(circle at center, #0f172a 0%, var(--bg-dark) 100%);
+  background: linear-gradient(to bottom, var(--bg-dark), #060606);
 }
 
 .testimonials-grid {
@@ -538,19 +480,9 @@ h1, h2, h3, h4 {
     transform: none;
   }
 
-  .workflow {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .benefits-grid,
-  .features-grid,
+  .plans-grid,
   .testimonials-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .workflow {
     grid-template-columns: 1fr;
   }
 }

@@ -1,240 +1,233 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sistema simples para organizar e consultar módulos de veículos com fotos e anotações práticas." />
+  <title>ECU Info | Ferramenta para Organizar Módulos de Veículos</title>
 
-    <!-- SEO Meta Tags Obrigatórios -->
-    <title>ECU Info | Sistema Profissional para Mapeamento de ECUs</title>
-    <meta name="description" content="Sistema web para técnicos automotivos organizarem, mapearem e consultarem centrais eletrônicas com rapidez, precisão e segurança.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Google Fonts (Exemplo: Poppins) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Favicon (Exemplo) -->
-    <link rel="icon" href="favicon.png" type="image/png">
-
-    <!-- CSS Externo -->
-    <link rel="stylesheet" href="landing.css">
+  <link rel="stylesheet" href="landing.css">
 </head>
 <body>
 
-    <!-- =======================
-         HEADER & HERO
-    ======================== -->
-    <header class="hero-section">
-        <div class="container">
-            <nav class="main-nav">
-                <div class="logo">ECU INFO</div>
-                <div class="nav-links">
-                    <a href="#features">Funcionalidades</a>
-                    <a href="#access">Acesso</a>
-                    <a href="#faq">FAQ</a>
-                    <a href="#cta" class="nav-cta">Iniciar Demonstração</a>
-                </div>
-            </nav>
-            <div class="hero-content">
-                <h1 class="fade-in-up">ECU Info. Organização técnica que economiza horas na bancada.</h1>
-                <p class="fade-in-up" style="animation-delay: 0.2s;">Sistema web profissional para mapear centrais eletrônicas, marcar pontos de teste e organizar conhecimento técnico com precisão.</p>
-                <a href="#cta" class="cta-button fade-in-up" style="animation-delay: 0.4s;">Iniciar demonstração técnica</a>
-                <p class="microcopy fade-in-up" style="animation-delay: 0.6s;">Demo controlada por 7 dias. Sem cartão.</p>
-            </div>
+<header class="hero-section">
+  <div class="hero-bg"></div>
+
+  <div class="container hero-layout">
+    <div class="hero-text">
+      <span class="hero-badge">Ferramenta Prática para Mecânicos • Feita para o Dia a Dia</span>
+      <h1>
+        ECU Info organiza suas anotações<br>e fotos de módulos de forma simples.
+      </h1>
+      <p>
+        Marque pontos importantes nas fotos, guarde medidas e observações. Reutilize tudo isso nos próximos serviços para ganhar tempo.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#cta" class="cta-button primary">Comece o Teste Grátis Agora</a>
+        <a href="#features" class="cta-button ghost">Veja Como Funciona</a>
+      </div>
+
+      <small>7 dias grátis. Sem precisar de cartão. Acesso total.</small>
+    </div>
+
+    <div class="hero-mockup">
+      <div class="mockup-frame">
+        <div class="mockup-header">
+          <span class="mockup-dot red"></span>
+          <span class="mockup-dot yellow"></span>
+          <span class="mockup-dot green"></span>
         </div>
+        <div class="mockup-body">
+          <div class="mockup-ui">
+            <div class="ui-sidebar"></div>
+            <div class="ui-main">
+              <div class="ui-image-placeholder"></div>
+              <div class="ui-annotations">
+                <div class="annotation pin1">Pino 14: 5V</div>
+                <div class="annotation pin2">Fio Terra</div>
+                <div class="trace-line"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section id="benefits" class="benefits-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Por Que Usar o ECU Info no Seu Dia a Dia?</h2>
+      <p>Economize tempo e evite erros repetidos na oficina.</p>
     </header>
 
-    <main>
+    <div class="benefits-grid">
+      <article class="benefit-card">
+        <div class="benefit-icon">⏱️</div>
+        <h3>Ganhe Tempo</h3>
+        <p>Encontre anotações antigas em segundos e não perca horas medindo tudo de novo.</p>
+      </article>
 
-        <!-- =======================
-             SEÇÃO: O PROBLEMA
-        ======================== -->
-        <section id="problem" class="problem-section">
-            <div class="container">
-                <div class="problem-content">
-                    <h2>O problema não é falta de informação. É desorganização.</h2>
-                    <p>Técnicos perdem tempo e dinheiro todos os dias com conhecimento espalhado. O risco de um erro por falta de um registro confiável é real e caro.</p>
-                    <ul>
-                        <li><span class="bullet-check"></span>Procurar anotações em cadernos ou fotos soltas no celular.</li>
-                        <li><span class="bullet-check"></span>Refazer medições e testes por não ter um histórico seguro.</li>
-                        <li><span class="bullet-check"></span>Correr riscos com informações de fontes não confiáveis.</li>
-                        <li><span class="bullet-check"></span>Deixar de atender um serviço por não encontrar um procedimento já feito.</li>
-                    </ul>
-                </div>
-                <div class="problem-visual">
-                    <img src="https://placehold.co/500x350/0B0B0B/FFFFFF" alt="Diagrama conceitual mostrando a organização de dados do ECU Info em contraste com o caos de informações desorganizadas.">
-                </div>
-            </div>
-        </section>
+      <article class="benefit-card">
+        <div class="benefit-icon">🔧</div>
+        <h3>Trabalhe Melhor</h3>
+        <p>Guarde fotos com marcas nos pontos certos, como pinos e fios, para consultar rápido.</p>
+      </article>
 
-        <!-- =======================
-             SEÇÃO: COMO RESOLVE (FEATURES)
-        ======================== -->
-        <section id="features" class="features-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Uma ferramenta, não um arquivo de PDFs.</h2>
-                    <p>O ECU Info foi desenhado para ser parte ativa do seu fluxo de trabalho na bancada.</p>
-                </div>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <h3>Editor de Mapeamento Técnico</h3>
-                        <p>Marque trilhas, componentes e pontos de teste direto nas fotos da ECU. Crie um mapa visual preciso e de consulta rápida.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Busca Técnica Instantânea</h3>
-                        <p>Encontre qualquer módulo, componente, pino ou anotação em segundos. Sua base de conhecimento, totalmente pesquisável.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Organização Profissional</h3>
-                        <p>Estruture seu conhecimento em projetos por cliente, veículo e data. Tenha um histórico técnico completo e acessível.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Histórico e Comparações</h3>
-                        <p>Consulte serviços anteriores, compare medições e nunca mais perca um detalhe. Tudo registrado e versionado.</p>
-                    </div>
-                    <div class="feature-card">
-                        <h3>Base Técnica Evolutiva</h3>
-                        <p>Seu conhecimento mais valioso, organizado e crescendo a cada serviço. Um ativo que se valoriza com o tempo.</p>
-                    </div>
-                     <div class="feature-card">
-                        <h3>Segurança e Acesso Remoto</h3>
-                        <p>Seus dados são seus, protegidos na nuvem. Acesse sua base de conhecimento de qualquer lugar, a qualquer hora.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+      <article class="benefit-card">
+        <div class="benefit-icon">📚</div>
+        <h3>Construa Seu Conhecimento</h3>
+        <p>Cada serviço vira uma referência útil para os próximos, crescendo sua base de dados pessoal.</p>
+      </article>
 
-        <!-- =======================
-             SEÇÃO: WORKFLOW
-        ======================== -->
-        <section id="workflow" class="workflow-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Workflow pensado para bancada, não para marketing.</h2>
-                    <p>Um fluxo de trabalho lógico que se integra à sua rotina, sem etapas desnecessárias.</p>
-                </div>
-                <div class="workflow-steps">
-                    <div class="workflow-step">
-                        <div class="step-number">1</div>
-                        <div class="step-content">
-                            <h4>Crie um Projeto</h4>
-                            <p>Associe o serviço a um cliente e veículo.</p>
-                        </div>
-                    </div>
-                    <div class="workflow-connector"></div>
-                    <div class="workflow-step">
-                        <div class="step-number">2</div>
-                        <div class="step-content">
-                            <h4>Suba as Fotos</h4>
-                            <p>Fotografe a ECU e envie para a plataforma.</p>
-                        </div>
-                    </div>
-                     <div class="workflow-connector"></div>
-                    <div class="workflow-step">
-                        <div class="step-number">3</div>
-                        <div class="step-content">
-                            <h4>Mapeie e Anote</h4>
-                            <p>Marque pontos, componentes e adicione notas.</p>
-                        </div>
-                    </div>
-                     <div class="workflow-connector"></div>
-                    <div class="workflow-step">
-                        <div class="step-number">4</div>
-                        <div class="step-content">
-                            <h4>Consulte e Evolua</h4>
-                            <p>Use a busca para acelerar diagnósticos futuros.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+      <article class="benefit-card">
+        <div class="benefit-icon">🔒</div>
+        <h3>Seus Dados Seguros</h3>
+        <p>Tudo fica com você, sem depender de ninguém. Exporte quando quiser.</p>
+      </article>
+    </div>
+  </div>
+</section>
 
-        <!-- =======================
-             SEÇÃO: MODELO DE ACESSO
-        ======================== -->
-        <section id="access" class="access-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Acesso direto e profissional.</h2>
-                    <p>Sem planos gratuitos com funcionalidades escondidas. Prove o valor, depois decida.</p>
-                </div>
-                <div class="access-cards">
-                    <div class="access-card">
-                        <h4>Demonstração Técnica</h4>
-                        <p>Acesso controlado de 7 dias aos recursos principais. Uma experiência real para você avaliar o impacto na sua rotina, sem compromisso e sem necessidade de cartão de crédito.</p>
-                        <span class="card-tag">Avaliação de Valor</span>
-                    </div>
-                    <div class="access-card">
-                        <h4>Assinatura Profissional</h4>
-                        <p>Acesso completo e ilimitado a todos os recursos de organização, mapeamento e busca. Crie quantos projetos e mapas precisar. Essencial para o uso contínuo na bancada.</p>
-                         <span class="card-tag">Uso Contínuo</span>
-                    </div>
-                    <div class="access-card">
-                        <h4>ECU Packs</h4>
-                        <p>Conteúdo técnico avançado e curado por especialistas. Mapas prontos e informações detalhadas de ECUs específicas. Disponível como um add-on exclusivo para assinantes.</p>
-                         <span class="card-tag">Conteúdo Avançado</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+<section id="features" class="features-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Funções Simples e Úteis para Sua Oficina</h2>
+      <p>Não é um depósito de arquivos, é uma ferramenta que ajuda no trabalho real.</p>
+    </header>
 
-        <!-- =======================
-             SEÇÃO: CTA FINAL
-        ======================== -->
-        <section id="cta" class="cta-section">
-            <div class="container">
-                <h2>Quando você sente falta do ECU Info, é porque ele já virou ferramenta.</h2>
-                <a href="#" class="cta-button">Iniciar demonstração técnica</a>
-                <p class="microcopy">Acesso controlado. Ferramenta profissional.</p>
-            </div>
-        </section>
+    <div class="features-grid">
+      <article class="feature-card">
+        <div class="feature-icon">📸</div>
+        <h3>Marcação nas Fotos</h3>
+        <p>Coloque marcas em pinos, fios e peças direto na imagem do módulo.</p>
+      </article>
 
-        <!-- =======================
-             SEÇÃO: FAQ
-        ======================== -->
-        <section id="faq" class="faq-section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Perguntas Frequentes</h2>
-                </div>
-                <div class="faq-grid">
-                    <details class="faq-item">
-                        <summary>A demonstração é realmente gratuita?</summary>
-                        <p>Sim. É uma demonstração técnica controlada por 7 dias. Não pedimos cartão de crédito. O objetivo é que você comprove o valor da ferramenta na sua operação.</p>
-                    </details>
-                    <details class="faq-item">
-                        <summary>Preciso assinar para usar os ECU Packs?</summary>
-                        <p>Sim. Os ECU Packs são conteúdos técnicos avançados, disponíveis como um add-on exclusivo para assinantes do plano profissional.</p>
-                    </details>
-                    <details class="faq-item">
-                        <summary>Meus projetos e mapas ficam salvos e seguros?</summary>
-                        <p>Absolutamente. Todo o seu trabalho é salvo na nuvem com segurança e pertence a você. Apenas você tem acesso à sua base de conhecimento.</p>
-                    </details>
-                    <details class="faq-item">
-                        <summary>Posso cancelar a assinatura a qualquer momento?</summary>
-                        <p>Sim. A assinatura é mensal e pode ser cancelada a qualquer momento, sem burocracia. Você mantém o acesso até o fim do período já pago.</p>
-                    </details>
-                </div>
-            </div>
-        </section>
+      <article class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Busca Rápida</h3>
+        <p>Ache o que precisa por pino, peça ou nota em poucos segundos.</p>
+      </article>
 
-    </main>
+      <article class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Registro de Mudanças</h3>
+        <p>Guarde todas as alterações e compare medidas antigas com novas.</p>
+      </article>
 
-    <!-- =======================
-         FOOTER
-    ======================== -->
-    <footer class="main-footer">
-        <div class="container">
-            <p>© 2024 ECU Info. Todos os direitos reservados.</p>
-            <div class="footer-links">
-                <a href="#features">Produto</a>
-                <a href="#cta">Demonstração</a>
-                <a href="#">Suporte</a>
-                <a href="#">Termos de Uso</a>
-            </div>
-        </div>
-    </footer>
+      <article class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <h3>Organização Fácil</h3>
+        <p>Separe por cliente, carro e data, sem complicações.</p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Base que Cresce</h3>
+        <p>Seu saber aumenta a cada conserto feito.</p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Controle Total</h3>
+        <p>Seus projetos são seus, sem amarras.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="workflow-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Passo a Passo Pensado para a Bancada</h2>
+      <p>Direto ao ponto, sem frescuras.</p>
+    </header>
+
+    <div class="workflow">
+      <div class="workflow-step">
+        <span class="step-number">1</span>
+        <h4>Crie o Serviço</h4>
+        <p>Coloque cliente, carro e detalhes básicos.</p>
+      </div>
+
+      <div class="workflow-step">
+        <span class="step-number">2</span>
+        <h4>Envie as Fotos</h4>
+        <p>Imagens reais do módulo do veículo.</p>
+      </div>
+
+      <div class="workflow-step">
+        <span class="step-number">3</span>
+        <h4>Marque e Anote</h4>
+        <p>Pontos, medidas e notas importantes.</p>
+      </div>
+
+      <div class="workflow-step">
+        <span class="step-number">4</span>
+        <h4>Consulte Depois</h4>
+        <p>Economize tempo em novos consertos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials" class="testimonials-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>O Que Mecânicos Como Você Estão Dizendo</h2>
+      <p>Veja como o ECU Info facilita a vida na oficina.</p>
+    </header>
+
+    <div class="testimonials-grid">
+      <article class="testimonial-card">
+        <p>"Antes eu perdia horas procurando anotações antigas. Agora, está tudo organizado e rápido de achar. Recomendo!"</p>
+        <cite>João, Mecânico em São Paulo</cite>
+      </article>
+
+      <article class="testimonial-card">
+        <p>"Facilita muito marcar os pinos nas fotos. Economizo tempo em todo serviço de módulo."</p>
+        <cite>Maria, Técnica Automotiva no Rio</cite>
+      </article>
+
+      <article class="testimonial-card">
+        <p>"É simples de usar e ajuda a não repetir erros. Minha oficina ficou mais eficiente."</p>
+        <cite>Pedro, Dono de Oficina em Minas</cite>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta-section">
+  <div class="container">
+    <h2>Experimente e veja como<br>sua oficina fica mais organizada.</h2>
+    <a href="#" class="cta-button primary large">Comece o Teste Grátis Agora</a>
+    <p class="microcopy">Acesso simples e suporte para você.</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-content">
+    <p>© 2024 ECU Info. Todos os direitos reservados.</p>
+    <nav>
+      <a href="#features">Funções</a>
+      <a href="#cta">Teste Grátis</a>
+      <a href="#">Ajuda</a>
+      <a href="#">Termos de Uso</a>
+      <a href="#">Privacidade</a>
+    </nav>
+  </div>
+</footer>
 
 </body>
 </html>
