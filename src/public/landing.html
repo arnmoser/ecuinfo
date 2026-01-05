@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Sistema simples para organizar e consultar módulos de veículos com fotos e anotações práticas." />
-  <title>ECU Info | Ferramenta para Organizar Módulos de Veículos</title>
+  <meta name="description" content="A ferramenta definitiva para reparadores de ECU. Mapeie pinouts, salve fotos de reparos e crie seu próprio banco de dados técnico." />
+  <title>ECU Info | Inteligência para sua Bancada</title>
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="landing.css">
 </head>
@@ -17,46 +16,73 @@
 
 <header class="hero-section">
   <div class="hero-bg"></div>
+  <div class="glow-effect top-center"></div>
 
   <div class="container hero-layout">
     <div class="hero-text">
-      <span class="hero-badge">Ferramenta Prática para Mecânicos • Feita para o Dia a Dia</span>
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        <span>Sistema para Reparadores de Centrais</span>
+      </div>
       <h1>
-        ECU Info organiza suas anotações<br>e fotos de módulos de forma simples.
+        Não confie apenas na memória.<br>
+        <span class="gradient-text">Domine seus reparos.</span>
       </h1>
       <p>
-        Marque pontos importantes nas fotos, guarde medidas e observações. Reutilize tudo isso nos próximos serviços para ganhar tempo.
+        Pare de perder tempo procurando o mesmo componente duas vezes. Mapeie componentes, salve fotos da placa e crie sua própria enciclopédia técnica de módulos automotivos.
       </p>
 
       <div class="hero-actions">
-        <a href="#cta" class="cta-button primary">Comece o Teste Grátis Agora</a>
-        <a href="#features" class="cta-button ghost">Veja Como Funciona</a>
+        <a href="#cta" class="cta-button primary">
+          <span>Criar Conta Grátis</span>
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+        </a>
       </div>
 
-      <small>7 dias grátis. Sem precisar de cartão. Acesso total.</small>
+      <div class="trust-badge">
+        <span class="check-icon">✓</span> 7 dias grátis • Sem cartão de crédito
+      </div>
     </div>
 
     <div class="hero-mockup">
       <div class="mockup-frame">
         <div class="mockup-header">
-          <span class="mockup-dot red"></span>
-          <span class="mockup-dot yellow"></span>
-          <span class="mockup-dot green"></span>
+          <div class="dots-group">
+            <span class="mockup-dot red"></span>
+            <span class="mockup-dot yellow"></span>
+            <span class="mockup-dot green"></span>
+          </div>
+          <div class="address-bar">ecu-info/workbench/bosch-me7</div>
         </div>
         <div class="mockup-body">
           <div class="mockup-ui">
-            <div class="ui-sidebar"></div>
+            <div class="ui-sidebar">
+              <div class="skeleton-line w-70"></div>
+              <div class="skeleton-line w-50"></div>
+              <div class="skeleton-line w-80"></div>
+            </div>
             <div class="ui-main">
-              <div class="ui-image-placeholder"></div>
+              <div class="ui-image-placeholder">
+                <span class="chip-label">CPU</span>
+              </div>
               <div class="ui-annotations">
-                <div class="annotation pin1">Pino 14: 5V</div>
-                <div class="annotation pin2">Fio Terra</div>
-                <div class="trace-line"></div>
+                <div class="annotation pin1">
+                  <span class="pin-dot"></span>
+                  <strong>Processador:</strong> ST10F
+                </div>
+                <div class="annotation pin2">
+                  <span class="pin-dot"></span>
+                  <strong>Defeito comum: Solda Fria</strong>
+                </div>
+                <svg class="trace-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path d="M40 35 L50 45" stroke="#22c55e" stroke-width="2" fill="none" class="dashed-line"/>
+                </svg>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div class="mockup-glow"></div>
     </div>
   </div>
 </header>
@@ -65,34 +91,48 @@
 
 <section id="benefits" class="benefits-section">
   <div class="container">
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number">Base Própria</span>
+        <span class="stat-label">Você constrói e organiza seus próprios módulos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">Mais Velocidade</span>
+        <span class="stat-label">Diagnóstico, comparação e decisão sem retrabalho</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">Controle Total</span>
+        <span class="stat-label">Informações, sob seu domínio</span>
+      </div>
+    </div>
+  </div>
+</section>
+
     <header class="section-header">
-      <h2>Por Que Usar o ECU Info no Seu Dia a Dia?</h2>
-      <p>Economize tempo e evite erros repetidos na oficina.</p>
+      <h2>Sua oficina, seus dados.</h2>
+      <p>O conhecimento técnico é o maior ativo da sua oficina. O ECU Info garante que ele fique organizado e acessível.</p>
     </header>
 
     <div class="benefits-grid">
       <article class="benefit-card">
-        <div class="benefit-icon">⏱️</div>
-        <h3>Ganhe Tempo</h3>
-        <p>Encontre anotações antigas em segundos e não perca horas medindo tudo de novo.</p>
+        <div class="card-glow"></div>
+        <div class="benefit-icon">⚡</div>
+        <h3>Diagnóstico Rápido</h3>
+        <p>Acesse os manuais de módulos que você criou em segundos. Nunca comece do zero.</p>
       </article>
 
       <article class="benefit-card">
-        <div class="benefit-icon">🔧</div>
-        <h3>Trabalhe Melhor</h3>
-        <p>Guarde fotos com marcas nos pontos certos, como pinos e fios, para consultar rápido.</p>
+        <div class="card-glow"></div>
+        <div class="benefit-icon">🎯</div>
+        <h3>Pinouts Precisos</h3>
+        <p>Marque na foto exata da placa onde estão os pontos de alimentação, Componentes e Defeitos.</p>
       </article>
 
       <article class="benefit-card">
-        <div class="benefit-icon">📚</div>
-        <h3>Construa Seu Conhecimento</h3>
-        <p>Cada serviço vira uma referência útil para os próximos, crescendo sua base de dados pessoal.</p>
-      </article>
-
-      <article class="benefit-card">
-        <div class="benefit-icon">🔒</div>
-        <h3>Seus Dados Seguros</h3>
-        <p>Tudo fica com você, sem depender de ninguém. Exporte quando quiser.</p>
+        <div class="card-glow"></div>
+        <div class="benefit-icon">🔐</div>
+        <h3>Segurança Total</h3>
+        <p>Backup na nuvem. Se seu computador da oficina queimar, seus esquemas continuam salvos.</p>
       </article>
     </div>
   </div>
@@ -100,47 +140,44 @@
 
 <section id="features" class="features-section">
   <div class="container">
-    <header class="section-header">
-      <h2>Funções Simples e Úteis para Sua Oficina</h2>
-      <p>Não é um depósito de arquivos, é uma ferramenta que ajuda no trabalho real.</p>
-    </header>
-
-    <div class="features-grid">
-      <article class="feature-card">
-        <div class="feature-icon">📸</div>
-        <h3>Marcação nas Fotos</h3>
-        <p>Coloque marcas em pinos, fios e peças direto na imagem do módulo.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="feature-icon">🔍</div>
-        <h3>Busca Rápida</h3>
-        <p>Ache o que precisa por pino, peça ou nota em poucos segundos.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="feature-icon">📝</div>
-        <h3>Registro de Mudanças</h3>
-        <p>Guarde todas as alterações e compare medidas antigas com novas.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="feature-icon">🗂️</div>
-        <h3>Organização Fácil</h3>
-        <p>Separe por cliente, carro e data, sem complicações.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="feature-icon">📈</div>
-        <h3>Base que Cresce</h3>
-        <p>Seu saber aumenta a cada conserto feito.</p>
-      </article>
-
-      <article class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <h3>Controle Total</h3>
-        <p>Seus projetos são seus, sem amarras.</p>
-      </article>
+    <div class="feature-layout">
+      <div class="feature-text">
+        <h2>Ferramentas Online,<br>Simplicidade de Uso</h2>
+        <p>Desenvolvido pensando na correria do dia a dia da oficina automotiva.</p>
+        
+        <ul class="feature-list">
+          <li>
+            <strong>📸 Mapeamento Visual:</strong>
+            <p>Tire a foto da placa e faça marcações, e textos direto nela.</p>
+          </li>
+          <li>
+            <strong>📁 Organização por Módulo ECU:</strong>
+            <p>Exemplo: Bosch ME7.5.30. Tudo estruturado.</p>
+          </li>
+          <li>
+            <strong>🔍 Busca Inteligente:</strong>
+            <p>Digite pelo módulo que você tem precisa rever informações com facilidade.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="visual-card">
+          <div class="search-bar-mock">
+            <span class="search-icon">🔍</span>
+            <span class="typing-text">Bosch ME7.5.30...</span>
+          </div>
+          <div class="result-list">
+            <div class="result-item active">
+              <span class="code">ME 7.4.9</span>
+              <span class="desc">Principais Defeitos: Queima de MCU...</span>
+            </div>
+            <div class="result-item">
+              <span class="code">ME 7.4.4</span>
+              <span class="desc">Principais Defeitos: Trilha do Driver Romp...</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -148,69 +185,49 @@
 <section class="workflow-section">
   <div class="container">
     <header class="section-header">
-      <h2>Passo a Passo Pensado para a Bancada</h2>
-      <p>Direto ao ponto, sem frescuras.</p>
+      <h2>Forma de Reparo</h2>
     </header>
 
     <div class="workflow">
+      <div class="workflow-line"></div>
+      
       <div class="workflow-step">
-        <span class="step-number">1</span>
-        <h4>Crie o Serviço</h4>
-        <p>Coloque cliente, carro e detalhes básicos.</p>
+        <div class="step-icon">1</div>
+        <h4>Entrada</h4>
+        <p>Cadastre o módulo.</p>
       </div>
 
       <div class="workflow-step">
-        <span class="step-number">2</span>
-        <h4>Envie as Fotos</h4>
-        <p>Imagens reais do módulo do veículo.</p>
+        <div class="step-icon">2</div>
+        <h4>Documentação</h4>
+        <p>Fotografe a placa aberta e marque os defeitos visuais.</p>
       </div>
 
       <div class="workflow-step">
-        <span class="step-number">3</span>
-        <h4>Marque e Anote</h4>
-        <p>Pontos, medidas e notas importantes.</p>
+        <div class="step-icon">3</div>
+        <h4>Solução</h4>
+        <p>Anote o componente e informações úteis para próximos reparos.</p>
       </div>
 
       <div class="workflow-step">
-        <span class="step-number">4</span>
-        <h4>Consulte Depois</h4>
-        <p>Economize tempo em novos consertos.</p>
+        <div class="step-icon">4</div>
+        <h4>Banco de Dados</h4>
+        <p>Pronto. Na próxima vez, a solução já está no seu bolso.</p>
       </div>
-    </div>
-  </div>
-</section>
-
-<section id="testimonials" class="testimonials-section">
-  <div class="container">
-    <header class="section-header">
-      <h2>O Que Mecânicos Como Você Estão Dizendo</h2>
-      <p>Veja como o ECU Info facilita a vida na oficina.</p>
-    </header>
-
-    <div class="testimonials-grid">
-      <article class="testimonial-card">
-        <p>"Antes eu perdia horas procurando anotações antigas. Agora, está tudo organizado e rápido de achar. Recomendo!"</p>
-        <cite>João, Mecânico em São Paulo</cite>
-      </article>
-
-      <article class="testimonial-card">
-        <p>"Facilita muito marcar os pinos nas fotos. Economizo tempo em todo serviço de módulo."</p>
-        <cite>Maria, Técnica Automotiva no Rio</cite>
-      </article>
-
-      <article class="testimonial-card">
-        <p>"É simples de usar e ajuda a não repetir erros. Minha oficina ficou mais eficiente."</p>
-        <cite>Pedro, Dono de Oficina em Minas</cite>
-      </article>
     </div>
   </div>
 </section>
 
 <section id="cta" class="cta-section">
-  <div class="container">
-    <h2>Experimente e veja como<br>sua oficina fica mais organizada.</h2>
-    <a href="#" class="cta-button primary large">Comece o Teste Grátis Agora</a>
-    <p class="microcopy">Acesso simples e suporte para você.</p>
+  <div class="glow-effect bottom-center"></div>
+  <div class="container relative-z">
+    <h2>Eleve o nível da sua oficina hoje.</h2>
+    <p class="cta-sub">Teste completo por 7 dias. Cancele quando quiser.</p>
+    
+    <div class="cta-group">
+      <a href="#" class="cta-button primary large">Começar Teste Grátis</a>
+    </div>
+    <p class="microcopy">Compatível com PC, não há necessidade de instalação, software totalmente online.</p>
   </div>
 </section>
 
@@ -218,13 +235,13 @@
 
 <footer class="footer">
   <div class="container footer-content">
-    <p>© 2024 ECU Info. Todos os direitos reservados.</p>
+    <div class="footer-brand">
+      <strong>ECU Info</strong>
+      <p>Tecnologia para reparação automotiva.</p>
+    </div>
     <nav>
-      <a href="#features">Funções</a>
-      <a href="#cta">Teste Grátis</a>
-      <a href="#">Ajuda</a>
-      <a href="#">Termos de Uso</a>
-      <a href="#">Privacidade</a>
+      <a href="#">Funcionalidades</a>
+      <a href="#">Login</a>
     </nav>
   </div>
 </footer>
