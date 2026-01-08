@@ -42,10 +42,8 @@ export async function signUpNewUser(email, password) {
 
   if (error) {
     console.error('Erro no registro:', error.message);
-  } else {
-    // Opcional: mostrar uma mensagem para o usuário checar o e-mail de confirmação.
-    alert('Registro realizado! Verifique seu e-mail para confirmar a conta.');
   }
+  // O feedback ao usuário foi movido para a camada de UI (ui-login.js)
 
   return { data, error };
 }
