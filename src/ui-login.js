@@ -1,4 +1,5 @@
 import { signInWithEmail, signUpNewUser } from './services/auth.js';
+import { showToast } from './ui-toast.js';
 
 function getUI() {
   return {
@@ -57,37 +58,44 @@ export function setupAuthForms() {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
+      // TODO: Adicionar feedback de "carregando" no botão
       await signInWithEmail(loginForm.email.value, loginForm.password.value);
     } catch {
-      alert('Email ou senha inválidos');
+      showToast('Email ou senha inválidos.', { type: 'error' });
     }
   });
 
   // --- Lógica do formulário de Registro ---
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    // TODO: Adicionar feedback de "carregando" no botão
     const email = registerForm.email.value;
     const password = registerForm.password.value;
     const passwordConfirm = registerForm.passwordConfirm.value;
 
+    if (password.length < 6) {
+      showToast('A senha deve ter no mínimo 6 caracteres.', { type: 'error' });
+      return;
+    }
+
     if (password !== passwordConfirm) {
-      alert('As senhas não conferem.');
+      showToast('As senhas não coincidem.', { type: 'error' });
       return;
     }
 
     try {
       const { error } = await signUpNewUser(email, password);
       if (error) {
-        alert(`Erro no registro: ${error.message}`);
+        showToast(`Erro no registro: ${error.message}`, { type: 'error' });
       } else {
-        // A função signUpNewUser já mostra um alerta de sucesso
+        showToast('Registro realizado! Verifique seu e-mail para confirmar a conta.', { type: 'success', duration: 6000 });
         registerForm.reset();
         // Volta para a tela de login
         registerForm.classList.add('hidden');
         loginForm.classList.remove('hidden');
       }
     } catch (err) {
-      alert('Ocorreu um erro inesperado. Tente novamente.');
+      showToast('Ocorreu um erro inesperado. Tente novamente.', { type: 'error' });
       console.error(err);
     }
   });

@@ -33,11 +33,18 @@
       </p>
 
       <div class="hero-actions">
-        <a href="#cta" class="cta-button primary">
-          <span>Criar Conta Grátis</span>
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-        </a>
-      </div>
+  <!-- Botão principal: abre index.html com hash #register para mostrar o formulário de cadastro -->
+  <a href="../../index.html#register" class="cta-button primary">
+    <span>Criar Conta Grátis</span>
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+    </svg>
+  </a>
+  <!-- Botão secundário: abre index.html com hash #login (padrão) -->
+  <a href="../../index.html#login" class="cta-button outline">
+    <span>Já tenho conta</span>
+  </a>
+</div>
 
       <div class="trust-badge">
         <span class="check-icon">✓</span> 7 dias grátis • Sem cartão de crédito
@@ -108,6 +115,8 @@
   </div>
 </section>
 
+<section class="benefits-section">
+  <div class="container">
     <header class="section-header">
       <h2>Sua oficina, seus dados.</h2>
       <p>O conhecimento técnico é o maior ativo da sua oficina. O ECU Info garante que ele fique organizado e acessível.</p>
@@ -225,7 +234,10 @@
     <p class="cta-sub">Teste completo por 7 dias. Cancele quando quiser.</p>
     
     <div class="cta-group">
-      <a href="#" class="cta-button primary large">Começar Teste Grátis</a>
+      <!-- Botão corrigido: agora leva diretamente para o cadastro -->
+      <a href="../../index.html" class="cta-button primary large">
+        Começar Teste Grátis
+      </a>
     </div>
     <p class="microcopy">Compatível com PC, não há necessidade de instalação, software totalmente online.</p>
   </div>
@@ -241,7 +253,7 @@
     </div>
     <nav>
       <a href="#">Funcionalidades</a>
-      <a href="#">Login</a>
+      <a href="../../index.html">Login</a>
     </nav>
   </div>
 </footer>

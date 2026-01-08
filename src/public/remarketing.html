@@ -25,6 +25,13 @@
         Teste de 7 dias encerrado
       </div>
 
+      <!-- Botão para login (caso o usuário queira logar primeiro) -->
+      <div class="hero-actions" style="margin: 32px 0;">
+        <a href="/index.html" class="btn-primary" style="padding: 14px 32px; font-size: 1rem;">
+          Fazer Login
+        </a>
+      </div>
+
       <h1>
         Reparador, sua oficina ganhou precisão.<br>
         <span>Não volte ao caos das buscas manuais.</span>
@@ -34,7 +41,8 @@
         Seus esquemas elétricos, pinagens e anotações personalizadas estão <strong>salvos e protegidos</strong> no ECU Info. Reative agora e continue diagnosticando veículos com rapidez, eficiência e sem erros que custam caro.
       </p>
 
-      <a href="#plans" class="btn-primary">
+      <!-- Botão principal que inicia checkout (mesmo se não logado) -->
+      <a href="#" id="hero-reativar" class="btn-primary">
         Reativar acesso agora
       </a>
 
@@ -60,7 +68,7 @@
             </svg>
             <strong>Acesso pausado</strong>
             <span>Seus dados técnicos estão intactos e prontos</span>
-            <button>Reativar agora</button>
+            <button id="lock-reativar">Reativar agora</button>
           </div>
         </div>
       </div>
@@ -103,7 +111,6 @@
   </div>
 </section>
 
-
 <section id="plans" class="plans">
   <div class="container">
     <header class="section-head">
@@ -120,7 +127,7 @@
           <li>Projetos salvos no nuvem</li>
           <li>Compatível com PC sem instalação</li>
         </ul>
-        <a href="#" class="btn-outline">Assinar mensal</a>
+        <a href="#" class="btn-outline" data-plan="monthly">Assinar mensal</a>
       </article>
 
       <article class="plan featured">
@@ -134,7 +141,7 @@
           <li>Compatível com PC sem instalação</li>
           <li>Acesso por 1 ano</li>
         </ul>
-        <a href="#" class="btn-primary">Assinar anual</a>
+        <a href="#" class="btn-primary" data-plan="annual">Assinar anual</a>
       </article>
     </div>
   </div>
@@ -168,6 +175,88 @@
     </nav>
   </div>
 </footer>
+
+<!-- Integração com pricing-integration.js -->
+<script type="module">
+  import { supabase } from '../services/supabase.js';
+  import { setupPricingButtons, openCustomerPortal } from '../services/pricing-integration.js';
+
+  // Função para adaptar a UI com base no status do usuário
+  async function adaptUIBasedOnUserStatus() {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    // 1. Usuário não logado, comportamento padrão de vendas
+    if (!session) {
+      console.log('User not logged in. Setting up standard pricing buttons.');
+      setupPricingButtons();
+      return;
+    }
+
+    // 2. Usuário logado, verificar se tem acesso
+    const { data: access, error } = await supabase
+      .from('account_access')
+      .select('has_access')
+      .eq('owner_user_id', session.user.id)
+      .single();
+
+    if (error) {
+      console.error('Error checking user access:', error);
+      setupPricingButtons(); // Fallback para o comportamento padrão
+      return;
+    }
+
+    // 3. Usuário com acesso ativo: adaptar página para gerenciamento
+    if (access && access.has_access) {
+      console.log('User has active access. Adapting UI.');
+      // Altera títulos e textos
+      document.querySelector('.hero-copy .status').innerHTML = `<span class="dot active"></span> Assinatura Ativa`;
+      document.querySelector('.hero-copy h1').innerHTML = 'Sua assinatura do ECU Info está ativa. 🚀';
+      document.querySelector('.hero-copy p').textContent = 'Continue aproveitando o acesso ilimitado a todos os diagramas e recursos. Para alterar seu plano ou dados de pagamento, acesse o portal do cliente.';
+      
+      // Remove botões de reativação do Hero
+      document.getElementById('hero-reativar')?.remove();
+      document.querySelector('.hero-copy .trust')?.remove();
+
+      // Substitui a seção de planos por um botão de gerenciamento
+      const plansSection = document.getElementById('plans');
+      if (plansSection) {
+        plansSection.innerHTML = `
+          <div class="container" style="text-align: center;">
+            <header class="section-head">
+              <h2>Gerenciar sua assinatura</h2>
+              <p>Altere seu plano, atualize sua forma de pagamento ou cancele a qualquer momento.</p>
+            </header>
+            <button id="manage-subscription-btn" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2.5rem;">
+              Acessar Portal do Cliente
+            </button>
+          </div>
+        `;
+        document.getElementById('manage-subscription-btn').addEventListener('click', openCustomerPortal);
+      }
+      
+      // Garante que outros botões não sejam configurados
+      return;
+    }
+
+    // 4. Usuário logado mas sem acesso (expirado): comportamento padrão de vendas
+    console.log('User logged in but has no access. Setting up standard pricing buttons.');
+    setupPricingButtons();
+  }
+
+  // Configura os botões principais do hero que não dependem do status de acesso
+  document.getElementById('hero-reativar')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector('[data-plan="annual"]').click();
+  });
+
+  document.getElementById('lock-reativar')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelector('[data-plan="annual"]').click();
+  });
+
+  // Executa a adaptação da UI
+  adaptUIBasedOnUserStatus();
+</script>
 
 </body>
 </html>

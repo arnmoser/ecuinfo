@@ -197,46 +197,31 @@ export async function getProjectsFromSupabase() {
    LOAD OR CREATE (LEGACY COMPAT)
    ===================================================== */
 export async function loadOrCreateUserProject() {
-  ensureAuth();
-
-  if (state.currentProjectId) {
-    return {
-      id: state.currentProjectId,
-      data: { modules: state.modules }
-    };
-  }
+  // Pega o usuário diretamente da sessão para evitar erros de 'state' não inicializado
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
 
   const { data, error } = await supabase
     .from('projects')
     .select('id, data')
-    .order('created_at', { ascending: false })
+    // Use uma coluna que temos certeza que existe após o SQL acima
+    .order('created_at', { ascending: false }) 
     .limit(1)
-    .single();
+    .maybeSingle(); // .maybeSingle() é mais elegante que tratar erro PGRST116
 
-  if (error && error.code !== 'PGRST116') {
-    const handled = await handleSupabaseError(error);
-    if (handled) return;
-    throw error;
-  }
+  if (error) throw error;
+  if (data) return data;
 
-  if (data) {
-    state.currentProjectId = data.id;
-    return data;
-  }
-
-  const emptyPayload = { version: 1, modules: [] };
-
+  // Se não existe, cria um
   const { data: created, error: createError } = await supabase
     .from('projects')
     .insert({
-      user_id: state.user.id,
-      data: emptyPayload
+      user_id: user.id, // ID garantido aqui
+      data: { version: 1, modules: [] }
     })
     .select('id, data')
     .single();
 
   if (createError) throw createError;
-
-  state.currentProjectId = created.id;
   return created;
 }

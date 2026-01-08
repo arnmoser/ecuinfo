@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagamento Aprovado | ECU Info</title>
+  <link rel="stylesheet" href="status-page.css" />
+  <style>
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #f3f3f3;
+      border-top-color: #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="success">
+  <div class="container">
+    <div class="card">
+      <div class="icon">✓</div>
+      <h1>Pagamento aprovado!</h1>
+      <p id="status-message">Só um instante, estamos reativando sua conta...</p>
+      <div id="spinner-area">
+        <div class="spinner"></div>
+      </div>
+      <div class="actions" id="actions-area" style="display: none;">
+        <a href="/index.html" class="btn-primary">Ir para o App</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from '../services/supabase.js';
+
+    const maxAttempts = 15; // 15 tentativas * 2 segundos = 30 segundos
+    let attempt = 0;
+
+    const statusMessage = document.getElementById('status-message');
+    const spinnerArea = document.getElementById('spinner-area');
+    const actionsArea = document.getElementById('actions-area');
+    
+    const authChannel = new BroadcastChannel('ecuinfo-auth-channel');
+
+    const intervalId = setInterval(async () => {
+      attempt++;
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        // Forçar uma nova busca em vez de usar o cache
+        const { data: access, error } = await supabase
+          .from('account_access')
+          .select('has_access')
+          .eq('owner_user_id', session.user.id)
+          .single();
+
+        if (access && access.has_access) {
+          clearInterval(intervalId);
+          
+          // Notifica outras abas para recarregarem
+          authChannel.postMessage({ type: 'RELOAD_STATUS' });
+
+          statusMessage.textContent = 'Sua conta está ativa! Redirecionando...';
+          spinnerArea.style.display = 'none';
+          setTimeout(() => {
+            window.location.href = '/index.html';
+          }, 1000);
+          return;
+        }
+      }
+
+      if (attempt >= maxAttempts) {
+        clearInterval(intervalId);
+        statusMessage.innerHTML = 'Sua conta será ativada em breve. O processo pode levar alguns minutos.<br>Se o acesso não for liberado, por favor, entre em contato com nosso suporte.';
+        spinnerArea.style.display = 'none';
+        actionsArea.style.display = 'block';
+      }
+    }, 2000);
+  </script>
+</body>
+</html>

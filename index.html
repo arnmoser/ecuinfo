@@ -11,43 +11,47 @@
 
 <body>
 
-  <!-- LOGIN -->
-<div id="login" class="login-wrapper hidden">
-  <!-- FORMULÁRIO DE LOGIN -->
-  <form id="loginForm" class="login-card">
-    <h2>Acessar o ECU Info</h2>
-    <p class="form-subtitle">Por favor, digite seu Email e Senha</p>
+  <!-- LOGIN WRAPPER -->
+  <div id="login" class="login-wrapper hidden">
 
-    <input type="email" name="email" placeholder="Email" required />
-    <input type="password" name="password" placeholder="Senha" required />
+    <!-- FORMULÁRIO DE LOGIN -->
+    <form id="loginForm" class="login-card">
+      <h2>Acessar o ECU Info</h2>
+      <p class="form-subtitle">Por favor, digite seu Email e Senha</p>
 
-    <button type="submit">Entrar</button>
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Senha" required />
 
-    <p class="form-toggle-link">
-      Não possui uma conta? <a href="#" id="showRegister">Crie uma agora</a>
-    </p>
-  </form>
+      <button type="submit">Entrar</button>
 
-  <!-- FORMULÁRIO DE REGISTRO (começa escondido) -->
-  <form id="registerForm" class="login-card hidden">
-    <h2>Criar Nova Conta</h2>
-    <p class="form-subtitle">É rápido e fácil, comece seu teste de 7 dias.</p>
+      <p class="form-toggle-link">
+        Não possui uma conta? 
+        <a href="landing.html" id="showRegister">Crie uma agora</a>
+      </p>
+    </form>
 
-    <input type="email" name="email" placeholder="Seu melhor email" required />
-    <input type="password" name="password" placeholder="Crie uma senha" required />
-    <input type="password" name="passwordConfirm" placeholder="Confirme a senha" required />
+    <!-- FORMULÁRIO DE REGISTRO (escondido inicialmente) -->
+    <form id="registerForm" class="login-card hidden">
+      <h2>Criar Nova Conta</h2>
+      <p class="form-subtitle">É rápido e fácil, comece seu teste de 7 dias.</p>
 
-    <button type="submit">Criar Conta</button>
+      <input type="email" name="email" placeholder="Seu melhor email" required />
+      <input type="password" name="password" placeholder="Crie uma senha" required />
+      <input type="password" name="passwordConfirm" placeholder="Confirme a senha" required />
 
-    <p class="form-toggle-link">
-      Já possui uma conta? <a href="#" id="showLogin">Faça o login</a>
-    </p>
-  </form>
-</div>
+      <button type="submit">Criar Conta</button>
+
+      <p class="form-toggle-link">
+        Já possui uma conta? 
+        <a href="#" id="showLogin">Faça o login</a>
+      </p>
+    </form>
+
+  </div>
 
   <!-- APP (começa escondido) -->
   <div id="app" class="hidden">
-
+    <!-- ... todo o resto do app (sidebar, main, etc.) permanece exatamente igual ao seu original ... -->
     <aside class="sidebar">
       <header class="sidebar-header">
         <h1>Mini ECU Mapper</h1>
@@ -104,7 +108,6 @@
         </div>
       </section>
     </main>
-
   </div>
 
   <!-- TEMPLATES -->
@@ -135,14 +138,14 @@
         <textarea id="mark-desc-input" rows="4"></textarea>
       </div>
       <div class="modal-buttons">
-          <button id="btn-delete-mark" class="btn-secondary danger">Deletar Marcação</button>
+        <button id="btn-delete-mark" class="btn-secondary danger">Deletar Marcação</button>
         <button id="btn-cancel-mark" class="btn-neutral">Cancelar</button>
         <button id="btn-save-mark" class="btn-primary">Salvar</button>
-      </div>
       </div>
     </div>
   </div>
 
   <script type="module" src="./src/main.js"></script>
+
 </body>
 </html>
