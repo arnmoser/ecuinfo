@@ -100,3 +100,24 @@ export function setupAuthForms() {
     }
   });
 }
+
+/**
+ * Exibe a tela de autenticação e decide qual formulário mostrar.
+ * @param {'login' | 'register'} intent - Qual formulário exibir.
+ */
+export function showAuthScreen(intent = 'login') {
+  const { loginWrapper, app, loginForm, registerForm } = getUI();
+  if (!loginWrapper || !app || !loginForm || !registerForm) return;
+
+  if (intent === 'register') {
+    loginForm.classList.add('hidden');
+    registerForm.classList.remove('hidden');
+  } else {
+    loginForm.classList.remove('hidden');
+    registerForm.classList.add('hidden');
+  }
+
+  // Garante que o container de autenticação geral esteja visível
+  loginWrapper.classList.remove('hidden');
+  app.classList.add('hidden');
+}

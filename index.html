@@ -51,7 +51,6 @@
 
   <!-- APP (começa escondido) -->
   <div id="app" class="hidden">
-    <!-- ... todo o resto do app (sidebar, main, etc.) permanece exatamente igual ao seu original ... -->
     <aside class="sidebar">
       <header class="sidebar-header">
         <h1>Mini ECU Mapper</h1>
@@ -70,6 +69,9 @@
         <input id="quickSearch" placeholder="Busca rápida (nomes e labels)" />
 
         <div class="top-actions">
+          <!-- NOVO BOTÃO: Gerenciar Assinatura -->
+          <button id="manageSubscriptionBtn" class="tool">Gerenciar Assinatura</button>
+
           <button id="logoutBtn" class="tool danger">Sair</button>
           <button id="saveProjectBtn" class="tool" disabled>Salvar Projetos</button>
           <label class="btn">
