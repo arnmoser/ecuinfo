@@ -13,6 +13,9 @@ function ensureAuth() {
   }
 }
 
+/**
+ * Garante que o payload tenha a estrutura mínima necessária.
+ */
 function normalizePayload(payload) {
   if (!payload || typeof payload !== 'object') {
     return { version: 1, modules: [] };
@@ -20,10 +23,27 @@ function normalizePayload(payload) {
 
   return {
     version: payload.version ?? 1,
-    modules: Array.isArray(payload.modules)
-      ? payload.modules
-      : []
+    modules: Array.isArray(payload.modules) ? payload.modules : []
   };
+}
+
+/**
+ * Remove o Base64 pesado se a imagem já estiver no Storage.
+ * Estratégia: Por segurança, mantemos o fallback por um tempo.
+ */
+function optimizePayload(payload) {
+  // Deep clone para não afetar o estado da UI imediatamente
+  const cleanPayload = JSON.parse(JSON.stringify(payload));
+  
+  cleanPayload.modules.forEach(mod => {
+    // Se existe path no storage, podemos limpar o base64 para economizar espaço no DB
+    // REGRA DE SEGURANÇA: Só limpa se o photo_path for uma string válida
+    if (mod.photo_path && mod.photo_path.length > 5) {
+      // mod.photo = ""; // Descomente esta linha após testar a migração por alguns dias
+    }
+  });
+  
+  return cleanPayload;
 }
 
 async function handleSupabaseError(error) {
@@ -43,7 +63,10 @@ async function handleSupabaseError(error) {
 export async function saveProjectToSupabase(payload) {
   ensureAuth();
 
-  const dataPayload = normalizePayload(payload);
+  // 1. Normaliza e 2. Otimiza (Remove Base64 desnecessário)
+  const basePayload = normalizePayload(payload);
+  const dataPayload = optimizePayload(basePayload);
+  
   const name = state.currentProjectName ?? 'Projeto sem nome';
 
   // CREATE
@@ -197,26 +220,23 @@ export async function getProjectsFromSupabase() {
    LOAD OR CREATE (LEGACY COMPAT)
    ===================================================== */
 export async function loadOrCreateUserProject() {
-  // Pega o usuário diretamente da sessão para evitar erros de 'state' não inicializado
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Usuário não autenticado");
 
   const { data, error } = await supabase
     .from('projects')
     .select('id, data')
-    // Use uma coluna que temos certeza que existe após o SQL acima
     .order('created_at', { ascending: false }) 
     .limit(1)
-    .maybeSingle(); // .maybeSingle() é mais elegante que tratar erro PGRST116
+    .maybeSingle();
 
   if (error) throw error;
   if (data) return data;
 
-  // Se não existe, cria um
   const { data: created, error: createError } = await supabase
     .from('projects')
     .insert({
-      user_id: user.id, // ID garantido aqui
+      user_id: user.id,
       data: { version: 1, modules: [] }
     })
     .select('id, data')

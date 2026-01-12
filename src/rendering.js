@@ -8,6 +8,7 @@ import { saveToStorage } from './storage.js';
 import {  editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
 import { syncSaveButton } from './ui-modal.js';
 import { setupTextMarkResize, startDragTextMark } from './marks.js';
+import { supabase } from './services/supabase.js';
 
 export function renderModuleList(){
   const q = moduleSearch.value.trim().toLowerCase();
@@ -33,25 +34,56 @@ export function renderModuleList(){
   });
 }
 
-export function renderCurrentModule(){
+export async function renderCurrentModule() {
   const mod = getCurrentModule();
-  if(!mod){
+  
+  // 1. Limpeza imediata da camada de marcas (evita fantasmas)
+  marksLayer.innerHTML = '';
+
+  if (!mod) {
     moduleNameInput.value = '';
     moduleNotesInput.value = '';
     stageImg.src = '';
     marksLayer.innerHTML = '<div class="no-module">Selecione ou crie um módulo.</div>';
     return;
   }
+
   moduleNameInput.value = mod.name;
   moduleNotesInput.value = mod.notes;
-  if(mod.photo){
-    stageImg.src = mod.photo;
-  } else {
-    stageImg.src = '';
-    stageImg.removeAttribute('src');
+
+  // 2. Tratamento para Módulo Novo (Sem Foto)
+  if (!mod.photo && !mod.photo_path) {
+    stageImg.src = ''; // Limpa a imagem anterior
+    marksLayer.innerHTML = `
+      <div class="no-photo-message">
+        <p>Este módulo ainda não possui imagem.</p>
+        <span>Clique em "Adicionar Foto" na barra superior para começar.</span>
+      </div>
+    `;
+    return; // Interrompe aqui, não precisa tentar carregar imagem ou assinar URL
   }
-  renderMarks();
-  renderModuleList();
+
+  // 3. Lógica de carregamento de imagem (se houver foto)
+  if (mod.photo_path) {
+    try {
+      const pathClean = String(mod.photo_path).trim().replace(/^\/+/, '');
+      const { data, error } = await supabase.storage
+        .from('ecu_images')
+        .createSignedUrl(pathClean, 3600);
+      
+      if (error) throw error;
+      if (data?.signedUrl) stageImg.src = data.signedUrl;
+    } catch (err) {
+      stageImg.src = mod.photo || ''; 
+    }
+  } else {
+    stageImg.src = mod.photo || '';
+  }
+
+  // 4. Renderização das marcas (Só ocorre se a imagem carregar com sucesso)
+  stageImg.onload = () => {
+    renderMarks();
+  };
 }
 
 
