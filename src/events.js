@@ -26,7 +26,7 @@ import {
 } from './rendering.js';
 import { syncSaveButton } from './ui-modal.js';
 import { saveProjectToSupabase } from './services/supabaseStorage.js';
-
+import { supabase } from './services/supabase.js';
 /* ======================
    SAVE HANDLER
    ====================== */
@@ -34,9 +34,18 @@ import { saveProjectToSupabase } from './services/supabaseStorage.js';
 async function handleSaveProject() {
   if (!state.dirty) return;
 
+  // --- OTIMIZAÇÃO: Limpa Base64 se já existir o caminho no Storage ---
+  state.modules.forEach(mod => {
+    if (mod.photo_path && mod.photo && mod.photo.startsWith('data:image')) {
+      console.log(`[Otimização] Removendo Base64 do módulo: ${mod.name}`);
+      mod.photo = ""; 
+    }
+  });
+  // ------------------------------------------------------------------
+
   let payload;
 
-  // 1. Salva local (fonte de verdade)
+  // 1. Salva local
   try {
     payload = saveToStorage();
   } catch (err) {
@@ -45,18 +54,15 @@ async function handleSaveProject() {
     return;
   }
 
-  // 2. Tenta sincronizar remoto (best-effort)
+  // 2. Tenta sincronizar remoto
   try {
     await saveProjectToSupabase(payload);
-    console.log('[remote] Projeto sincronizado');
+    console.log('[remote] Projeto sincronizado e otimizado');
   } catch (err) {
     console.error('[remote] Falha ao sincronizar', err);
-    alert(
-      'Projeto salvo localmente, mas não foi possível sincronizar com o servidor.'
-    );
+    alert('Projeto salvo localmente, mas não foi possível sincronizar.');
   }
 
-  // 3. Finaliza ciclo
   state.dirty = false;
   syncSaveButton();
 }
@@ -92,23 +98,62 @@ export function setupGlobalEvents() {
 
   /* -------- IMAGE UPLOAD -------- */
   photoInput?.addEventListener('change', async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-    const module = getCurrentModule();
-    if (!module) {
-      alert('Selecione um módulo antes de adicionar uma imagem.');
-      photoInput.value = '';
-      return;
+  const module = getCurrentModule();
+  if (!module) {
+    alert('Selecione um módulo antes de adicionar uma imagem.');
+    photoInput.value = '';
+    return;
+  }
+
+  // GARANTIA: Se o projeto é novo e não tem ID, precisamos salvar o projeto 
+  // no DB primeiro para gerar um ID, OU usar um placeholder.
+  // Vamos garantir que state.currentProjectId existe:
+  if (!state.currentProjectId) {
+    try {
+       // Força a criação do projeto no DB para obter o ID real antes do upload da foto
+       const payload = saveToStorage();
+       await saveProjectToSupabase(payload); 
+    } catch (err) {
+       alert("Erro ao preparar projeto para receber imagem. Tente salvar o projeto uma vez antes.");
+       return;
     }
+  }
 
-    module.photo = await fileToDataURL(file);
+  try {
+    const userId = String(state.user.id).trim();
+    const projectId = String(state.currentProjectId).trim();
+    const moduleId = String(module.id).trim();
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    
+    // Caminho limpo: evita barras duplas ou espaços
+    const filePath = `${userId}/${projectId}/${moduleId}.${fileExt}`;
+
+
+    const { data, error: uploadError } = await supabase.storage
+      .from('ecu_images')
+      .upload(filePath, file, { 
+          upsert: true,
+          contentType: file.type // Ajuda o navegador a identificar o arquivo
+      });
+
+    if (uploadError) throw uploadError;
+
+    module.photo = await fileToDataURL(file); 
+    module.photo_path = filePath; 
+
     state.dirty = true;
     syncSaveButton();
     renderCurrentModule();
-
+  } catch (err) {
+    console.error('Erro no upload:', err);
+    alert(`Erro: ${err.message}`);
+  } finally {
     photoInput.value = '';
-  });
+  }
+});
 
   /* -------- EXPORT -------- */
   exportBtn?.addEventListener('click', () => {

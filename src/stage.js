@@ -19,7 +19,11 @@ export function applyTransform(){
 
 export function setupStagePanZoom(){
   stage.addEventListener('wheel', (e) => {
-    if(!getCurrentModule() || !getCurrentModule().photo) return;
+    const mod = getCurrentModule();
+    
+    // CORREÇÃO: Verifica se existe photo OU photo_path
+    if (!mod || (!mod.photo && !mod.photo_path)) return; 
+    
     e.preventDefault();
 
     const rect = stage.getBoundingClientRect();
