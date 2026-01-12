@@ -52,16 +52,33 @@ export async function renderCurrentModule() {
   moduleNotesInput.value = mod.notes;
 
   // 2. Tratamento para Módulo Novo (Sem Foto)
-  if (!mod.photo && !mod.photo_path) {
-    stageImg.src = ''; // Limpa a imagem anterior
-    marksLayer.innerHTML = `
-      <div class="no-photo-message">
-        <p>Este módulo ainda não possui imagem.</p>
-        <span>Clique em "Adicionar Foto" na barra superior para começar.</span>
+if (!mod.photo && !mod.photo_path) {
+  stageImg.src = ''; 
+  
+  // Limpa as marcas antigas
+  marksLayer.innerHTML = '';
+  
+  // Remove qualquer aviso antigo para não duplicar
+  const oldMsg = stage.querySelector('.no-photo-message');
+  if (oldMsg) oldMsg.remove();
+
+  // Injeta o aviso direto no STAGE (o pai fixo)
+  const msgHtml = `
+    <div class="no-photo-message">
+      <div class="no-photo-card">
+        <div style="font-size: 50px; margin-bottom: 20px;">🖼️</div>
+        <p>Módulo sem imagem de referência</p>
+        <span>Para realizar as marcações, use o botão <b>"Adicionar Foto"</b> na barra superior.</span>
       </div>
-    `;
-    return; // Interrompe aqui, não precisa tentar carregar imagem ou assinar URL
-  }
+    </div>
+  `;
+  stage.insertAdjacentHTML('beforeend', msgHtml);
+  return; 
+} else {
+  // Se houver foto, remove o aviso caso ele esteja lá
+  const oldMsg = stage.querySelector('.no-photo-message');
+  if (oldMsg) oldMsg.remove();
+}
 
   // 3. Lógica de carregamento de imagem (se houver foto)
   if (mod.photo_path) {

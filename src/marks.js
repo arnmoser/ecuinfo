@@ -180,11 +180,13 @@ export function setupMarkCreationEvents() {
   let isHolding = false;
 
   stage.addEventListener('mousedown', (e) => {
-    if (e.button !== 0) return;
-    if (e.target.closest('.mark')) return;
+    if (e.button !== 0) return; // Só botão esquerdo
+    if (e.target.closest('.mark')) return; // Não cria marca em cima de outra
 
     const mod = getCurrentModule();
-    if (!mod || !mod.photo) return;
+    
+    // CORREÇÃO AQUI: Aceitar tanto a foto em Base64 quanto o caminho do Storage
+    if (!mod || (!mod.photo && !mod.photo_path)) return; 
 
     isHolding = true;
     markPressStart = { x: e.clientX, y: e.clientY };
@@ -317,8 +319,8 @@ export function setupTextMarkResize() {
       if (dir.includes('n')) { newH -= dy; newY += dy; } // cima
 
       // Limites mínimos e máximos (em fração da imagem)
-      newW = Math.max(0.08, Math.min(1, newW));
-      newH = Math.max(0.06, Math.min(1, newH));
+      newW = Math.max(0.05, Math.min(1, newW));
+      newH = Math.max(0.05, Math.min(1, newH));
       newX = Math.max(0, Math.min(1 - newW, newX));
       newY = Math.max(0, Math.min(1 - newH, newY));
 
