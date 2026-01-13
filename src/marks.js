@@ -1,6 +1,6 @@
 /* marks.js - Lógica de Marcas (Adicionar, Editar, Drag) */
 import { state, getCurrentModule } from './state.js';
-import { stage, marksLayer } from './dom.js';
+import { getStageContent, stage, marksLayer } from './dom.js';
 import { uid } from './utils.js';
 import { renderMarks } from './rendering.js';
 import { MARK_HOLD_TIME, HOLD_MOVE_TOLERANCE } from './constants.js';
@@ -16,8 +16,9 @@ let activeMark = null;
 
 export function addMarkAtClientXY(clientX, clientY, type='point'){
   const mod = getCurrentModule();
-  if(!mod || !stage) return;
-  const rect = stage.getBoundingClientRect();
+  const content = getStageContent();
+  if(!mod || !stage || !content) return;
+  const rect = content.getBoundingClientRect();
   const relX = (clientX - rect.left) / rect.width;
   const relY = (clientY - rect.top) / rect.height;
   if(relX < 0 || relX > 1 || relY < 0 || relY > 1) return;
@@ -110,6 +111,42 @@ export function openTextMarkMenu(mark) {
     titleInput.focus();
 }
 
+export function openPointMarkMenu(mark) {
+    titleInput.value = mark.label || '';
+    descInput.value = mark.description || '';
+    activeMark = mark;
+
+    btnSaveMark.onclick = () => {
+        const newTitle = titleInput.value;
+        mark.label = newTitle;
+        mark.title = newTitle;
+        mark.description = descInput.value;
+
+        state.dirty = true;
+        syncSaveButton();
+        renderMarks();
+        closeModal();
+    };
+
+    btnCancelMark.onclick = () => {
+        closeModal();
+    };
+
+    btnDeleteMark.onclick = () => {
+        const confirmed = confirm(
+            'Tem certeza que deseja deletar esta marcacao?\nEssa acao nao pode ser desfeita.'
+        );
+
+        if (!confirmed) return;
+
+        deleteMark(mark.id);
+        closeModal();
+    };
+
+    modalOverlay.classList.remove('hidden');
+    titleInput.focus();
+}
+
 function closeModal() {
     modalOverlay.classList.add('hidden');
 }
@@ -148,7 +185,17 @@ export function editMarkLabel(mark, labelEl){
 /* MARK DRAG */
 export function startDragMark(ev, mark, el){
   ev.preventDefault();
-  currentDrag = { mark, el, startClientX: ev.clientX, startClientY: ev.clientY };
+  const content = getStageContent();
+  if (!content) return;
+  const rect = content.getBoundingClientRect();
+  const relX = (ev.clientX - rect.left) / rect.width;
+  const relY = (ev.clientY - rect.top) / rect.height;
+  currentDrag = {
+    mark,
+    el,
+    offsetX: relX - mark.x,
+    offsetY: relY - mark.y
+  };
   el.classList.add('dragging');
   window.addEventListener('mousemove', onDragMark);
   window.addEventListener('mouseup', endDragMark);
@@ -156,11 +203,15 @@ export function startDragMark(ev, mark, el){
 
 function onDragMark(e){
   if(!currentDrag) return;
-  const rect = stage.getBoundingClientRect();
+  const content = getStageContent();
+  if (!content) return;
+  const rect = content.getBoundingClientRect();
   const relX = (e.clientX - rect.left) / rect.width;
   const relY = (e.clientY - rect.top) / rect.height;
-  currentDrag.mark.x = Math.max(0, Math.min(1, parseFloat(relX.toFixed(6))));
-  currentDrag.mark.y = Math.max(0, Math.min(1, parseFloat(relY.toFixed(6))));
+  const nextX = relX - currentDrag.offsetX;
+  const nextY = relY - currentDrag.offsetY;
+  currentDrag.mark.x = Math.max(0, Math.min(1, parseFloat(nextX.toFixed(6))));
+  currentDrag.mark.y = Math.max(0, Math.min(1, parseFloat(nextY.toFixed(6))));
   // move element visually
   currentDrag.el.style.left = (currentDrag.mark.x*100) + '%';
   currentDrag.el.style.top = (currentDrag.mark.y*100) + '%';
@@ -319,8 +370,8 @@ export function setupTextMarkResize() {
       if (dir.includes('n')) { newH -= dy; newY += dy; } // cima
 
       // Limites mínimos e máximos (em fração da imagem)
-      newW = Math.max(0.05, Math.min(1, newW));
-      newH = Math.max(0.05, Math.min(1, newH));
+      newW = Math.max(0.03, Math.min(1, newW));
+      newH = Math.max(0.03, Math.min(1, newH));
       newX = Math.max(0, Math.min(1 - newW, newX));
       newY = Math.max(0, Math.min(1 - newH, newY));
 
