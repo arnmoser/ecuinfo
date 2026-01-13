@@ -27,7 +27,7 @@
 
       <!-- Botão para login (caso o usuário queira logar primeiro) -->
       <div class="hero-actions" style="margin: 32px 0;">
-        <a href="/index.html" class="btn-primary" style="padding: 14px 32px; font-size: 1rem;">
+        <a href="/index.html?from=remarketing#plans" class="btn-primary" style="padding: 14px 32px; font-size: 1rem;">
           Fazer Login
         </a>
       </div>
@@ -123,8 +123,8 @@
         <h3>Mensal</h3>
         <div class="price">R$ 29,90</div>
         <ul>
-          <li>Acesso ilimitado a esquemas e pinagens</li>
-          <li>Projetos salvos no nuvem</li>
+          <li>Acesso aos seus esquemas</li>
+          <li>Projetos salvos na nuvem</li>
           <li>Compatível com PC sem instalação</li>
         </ul>
         <a href="#" class="btn-outline" data-plan="monthly">Assinar mensal</a>
@@ -133,11 +133,11 @@
       <article class="plan featured">
         <span class="badge">Mais vantajoso</span>
         <h3>Anual</h3>
-        <div class="price">R$ 297 / ano</div>
-        <small>Equivalente a R$ 24,75/mês – Economia de 17%</small>
+        <div class="price">R$ 249 / ano</div>
+        <small>Equivalente a R$ 20,75/mês — Economia de 30%</small>
         <ul>
-          <li>Acesso ilimitado a esquemas e pinagens</li>
-          <li>Projetos salvos no nuvem</li>
+          <li>Acesso aos seus esquemas</li>
+          <li>Projetos salvos na nuvem</li>
           <li>Compatível com PC sem instalação</li>
           <li>Acesso por 1 ano</li>
         </ul>
@@ -181,43 +181,55 @@
   import { supabase } from '../services/supabase.js';
   import { setupPricingButtons, openCustomerPortal } from '../services/pricing-integration.js';
 
-  // Função para adaptar a UI com base no status do usuário
+  function scrollToAnchorIfAny() {
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    const target = document.querySelector(hash);
+    if (!target) return;
+
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
   async function adaptUIBasedOnUserStatus() {
     const { data: { session } } = await supabase.auth.getSession();
 
-    // 1. Usuário não logado, comportamento padrão de vendas
+    // 1) Não logado → modo venda
     if (!session) {
-      console.log('User not logged in. Setting up standard pricing buttons.');
       setupPricingButtons();
+      scrollToAnchorIfAny();
       return;
     }
 
-    // 2. Usuário logado, verificar se tem acesso
+    // 2) Logado → checa acesso
     const { data: access, error } = await supabase
       .from('account_access')
       .select('has_access')
       .eq('owner_user_id', session.user.id)
       .single();
 
+    // Se falhou a checagem → fallback venda
     if (error) {
       console.error('Error checking user access:', error);
-      setupPricingButtons(); // Fallback para o comportamento padrão
+      setupPricingButtons();
+      scrollToAnchorIfAny();
       return;
     }
 
-    // 3. Usuário com acesso ativo: adaptar página para gerenciamento
-    if (access && access.has_access) {
-      console.log('User has active access. Adapting UI.');
-      // Altera títulos e textos
-      document.querySelector('.hero-copy .status').innerHTML = `<span class="dot active"></span> Assinatura Ativa`;
-      document.querySelector('.hero-copy h1').innerHTML = 'Sua assinatura do ECU Info está ativa. 🚀';
-      document.querySelector('.hero-copy p').textContent = 'Continue aproveitando o acesso ilimitado a todos os diagramas e recursos. Para alterar seu plano ou dados de pagamento, acesse o portal do cliente.';
-      
-      // Remove botões de reativação do Hero
+    // 3) Acesso ativo → modo gerenciamento
+    if (access?.has_access) {
+      document.querySelector('.hero-copy .status').innerHTML =
+        `<span class="dot active"></span> Assinatura Ativa`;
+      document.querySelector('.hero-copy h1').innerHTML =
+        'Sua assinatura do ECU Info está ativa. 🚀';
+      document.querySelector('.hero-copy p').textContent =
+        'Continue aproveitando o acesso ilimitado a todos os diagramas e recursos. Para alterar seu plano ou dados de pagamento, acesse o portal do cliente.';
+
       document.getElementById('hero-reativar')?.remove();
       document.querySelector('.hero-copy .trust')?.remove();
 
-      // Substitui a seção de planos por um botão de gerenciamento
       const plansSection = document.getElementById('plans');
       if (plansSection) {
         plansSection.innerHTML = `
@@ -231,32 +243,41 @@
             </button>
           </div>
         `;
-        document.getElementById('manage-subscription-btn').addEventListener('click', openCustomerPortal);
+        document.getElementById('manage-subscription-btn')
+          ?.addEventListener('click', openCustomerPortal);
       }
-      
-      // Garante que outros botões não sejam configurados
+
+      scrollToAnchorIfAny(); // se veio com #plans, cai no "gerenciar"
       return;
     }
 
-    // 4. Usuário logado mas sem acesso (expirado): comportamento padrão de vendas
-    console.log('User logged in but has no access. Setting up standard pricing buttons.');
+    // 4) Logado mas expirado → modo venda
     setupPricingButtons();
+    scrollToAnchorIfAny();
   }
 
-  // Configura os botões principais do hero que não dependem do status de acesso
-  document.getElementById('hero-reativar')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('[data-plan="annual"]').click();
-  });
+  // Botões do hero/lock sempre empurram para o anual
+  function goToPlans() {
+  const el = document.getElementById('plans');
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-  document.getElementById('lock-reativar')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    document.querySelector('[data-plan="annual"]').click();
-  });
+document.getElementById('hero-reativar')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  goToPlans();
+});
 
-  // Executa a adaptação da UI
-  adaptUIBasedOnUserStatus();
+document.getElementById('lock-reativar')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  goToPlans();
+});
+
+
+  // Executa e garante scroll no final
+  adaptUIBasedOnUserStatus().finally(scrollToAnchorIfAny);
 </script>
+
 
 </body>
 </html>
