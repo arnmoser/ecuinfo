@@ -5,7 +5,7 @@ import {
   moduleNotesInput, stageImg, marksLayer, markTpl, quickSearch 
 } from './dom.js';
 import { saveToStorage } from './storage.js';
-import {  editMarkLabel, startDragMark, openTextMarkMenu } from './marks.js'; 
+import { editMarkLabel, startDragMark, openTextMarkMenu, openPointMarkMenu } from './marks.js'; 
 import { syncSaveButton } from './ui-modal.js';
 import { setupTextMarkResize, startDragTextMark } from './marks.js';
 import { supabase } from './services/supabase.js';
@@ -154,7 +154,8 @@ export function renderMarks(){
 
   } else {
     // === Marks de ponto (mantém exatamente como estava) ===
-    dot.style.transform = `scale(${mark.size || 1})`;
+    el.classList.add('point-mark');
+    dot.style.transform = 'scale(1)';
     label.textContent = mark.label || '';
     el.style.left = (mark.x*100) + '%';
     el.style.top = (mark.y*100) + '%';
@@ -180,16 +181,10 @@ export function renderMarks(){
       startDragMark(ev, mark, el);
     });
 
-    // Zoom com scroll (só para pontos)
-    dot.addEventListener('wheel', (e) => {
-      e.preventDefault();
+    el.addEventListener('click', (e) => {
       e.stopPropagation();
-      const delta = e.deltaY < 0 ? 0.1 : -0.1;
-      mark.size = Math.max(0.3, Math.min(4, (mark.size || 1) + delta));
-      dot.style.transform = `scale(${mark.size})`;
-      state.dirty = true;
-      syncSaveButton();
-    }, { passive: false });
+      openPointMarkMenu(mark);
+    });
   }
 
   // Click para abrir modal (só texto)
