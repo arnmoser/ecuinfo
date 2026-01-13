@@ -105,7 +105,7 @@ function showAccessBlockedScreen(account) {
       <p>Seus projetos estão salvos e seguros.</p>
       <p>Para continuar usando o ECU Info, escolha um plano:</p>
       <div style="margin: 2rem 0; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-        <button onclick="location.href='src/public/remarketing.html'" style="padding: 1rem 2rem; font-size: 1.1rem; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer;">
+        <button onclick="location.href='src/public/remarketing.html#plans'" style="padding: 1rem 2rem; font-size: 1.1rem; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer;">
           Ver Planos e Reativar
         </button>
         <button onclick="supabase.auth.signOut()" style="padding: 1rem 2rem; font-size: 1.1rem; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer;">
