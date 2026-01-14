@@ -1,5 +1,11 @@
 import { signInWithEmail, signUpNewUser } from './services/auth.js';
 import { showToast } from './ui-toast.js';
+import {
+  buildAcceptancePayload,
+  getCurrentLegalVersions,
+  formatLegalDate,
+  savePendingLegalAcceptance
+} from './services/legalService.js';
 
 function getUI() {
   return {
@@ -72,6 +78,7 @@ export function setupAuthForms() {
     const email = registerForm.email.value;
     const password = registerForm.password.value;
     const passwordConfirm = registerForm.passwordConfirm.value;
+    const acceptLegal = registerForm.acceptLegal;
 
     if (password.length < 6) {
       showToast('A senha deve ter no mínimo 6 caracteres.', { type: 'error' });
@@ -80,16 +87,39 @@ export function setupAuthForms() {
 
     if (password !== passwordConfirm) {
       showToast('As senhas não coincidem.', { type: 'error' });
+    return;
+  }
+
+    if (!acceptLegal?.checked) {
+      showToast('VocÇ¦ precisa aceitar os Termos de Uso e a PolÇðtica de Privacidade.', { type: 'error' });
+      const warning = document.getElementById('legalWarning');
+      const consentLabel = registerForm?.querySelector('.legal-consent');
+      if (warning) {
+        warning.classList.remove('hidden');
+        warning.classList.add('is-visible');
+      }
+      if (consentLabel) {
+        consentLabel.classList.add('error');
+      }
+      acceptLegal?.focus();
       return;
     }
 
-    try {
-      const { error } = await signUpNewUser(email, password);
-      if (error) {
-        showToast(`Erro no registro: ${error.message}`, { type: 'error' });
+  try {
+    const legalVersions = await getCurrentLegalVersions();
+    const legalPayload = buildAcceptancePayload(legalVersions);
+    const { error } = await signUpNewUser(email, password, legalPayload);
+    if (error) {
+      showToast(`Erro no registro: ${error.message}`, { type: 'error' });
       } else {
+        savePendingLegalAcceptance(legalPayload);
         showToast('Registro realizado! Verifique seu e-mail para confirmar a conta.', { type: 'success', duration: 6000 });
         registerForm.reset();
+        if (acceptLegal) {
+          acceptLegal.checked = false;
+          const submitBtn = registerForm.querySelector('button[type="submit"]');
+          if (submitBtn) submitBtn.disabled = true;
+        }
         // Volta para a tela de login
         registerForm.classList.add('hidden');
         loginForm.classList.remove('hidden');
@@ -99,6 +129,41 @@ export function setupAuthForms() {
       console.error(err);
     }
   });
+
+  hydrateLegalConsentUI(registerForm);
+}
+
+async function hydrateLegalConsentUI(registerForm) {
+  const acceptLegal = registerForm?.acceptLegal;
+  const submitBtn = registerForm?.querySelector('button[type="submit"]');
+  const legalMeta = document.getElementById('registerLegalMeta');
+
+  if (!acceptLegal || !submitBtn) return;
+
+  const syncButton = () => {
+    submitBtn.disabled = !acceptLegal.checked;
+  };
+
+  acceptLegal.addEventListener('change', () => {
+    syncButton();
+    const warning = document.getElementById('legalWarning');
+    const consentLabel = registerForm?.querySelector('.legal-consent');
+    if (warning) {
+      warning.classList.add('hidden');
+      warning.classList.remove('is-visible');
+    }
+    if (consentLabel) {
+      consentLabel.classList.remove('error');
+    }
+  });
+  syncButton();
+
+  const legalVersions = await getCurrentLegalVersions();
+  if (legalMeta) {
+    const termsDate = formatLegalDate(legalVersions.terms_effective_at);
+    const privacyDate = formatLegalDate(legalVersions.privacy_effective_at);
+    legalMeta.textContent = `Versao vigente: Termos ${legalVersions.terms_version} (${termsDate}) | Politica ${legalVersions.privacy_version} (${privacyDate})`;
+  }
 }
 
 /**

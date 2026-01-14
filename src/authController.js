@@ -7,6 +7,15 @@ import { initUI } from './main-ui.js';
 import { setupLogout } from './ui-logout.js';
 import { loadAccount } from './services/accountService.js';
 import { supabase } from './services/supabase.js';
+import {
+  checkLegalAcceptance,
+  clearPendingLegalAcceptance,
+  getCurrentLegalVersions,
+  loadPendingLegalAcceptance,
+  matchesLegalVersions,
+  recordLegalAcceptance
+} from './services/legalService.js';
+import { hideLegalAcceptanceModal, showLegalAcceptanceModal } from './ui-legal.js';
 
 // Canal para sincronização entre abas
 const authChannel = new BroadcastChannel('ecuinfo-auth-channel');
@@ -42,24 +51,70 @@ async function bootstrapUser(session) {
   state.user = session.user;
 
   try {
-    // 1. Carrega dados da conta
+    // 1) Checa aceite legal antes de acessar accounts/account_access
+    const legalVersions = await getCurrentLegalVersions();
+    const { accepted, error: legalError } = await checkLegalAcceptance(session.user.id, legalVersions);
+
+    if (legalError && legalError.code !== '42P01') {
+      showToast('N???"o foi poss????vel validar os Termos e a Pol????tica de Privacidade. Tente novamente.', { type: 'error' });
+      await supabase.auth.signOut();
+      return;
+    }
+
+    let hasAcceptedLegal = Boolean(accepted) || legalError?.code === '42P01';
+    if (!hasAcceptedLegal) {
+      const pendingAcceptance = loadPendingLegalAcceptance();
+      if (matchesLegalVersions(pendingAcceptance, legalVersions)) {
+        const { error: recordError } = await recordLegalAcceptance(
+          session.user.id,
+          legalVersions,
+          pendingAcceptance.user_agent
+        );
+
+        if (!recordError) {
+          clearPendingLegalAcceptance();
+          hasAcceptedLegal = true;
+        }
+      }
+    }
+
+    if (!hasAcceptedLegal) {
+      const acceptedNow = await showLegalAcceptanceModal(legalVersions);
+      if (!acceptedNow) {
+        hideLegalAcceptanceModal();
+        await supabase.auth.signOut();
+        return;
+      }
+
+      const { error: recordError } = await recordLegalAcceptance(session.user.id, legalVersions);
+      if (recordError && recordError.code !== '42P01') {
+        showToast('N???"o foi poss????vel registrar seu aceite. Tente novamente.', { type: 'error' });
+        hideLegalAcceptanceModal();
+        await supabase.auth.signOut();
+        return;
+      }
+
+      hideLegalAcceptanceModal();
+    }
+
+    // 2) Carrega dados da conta
     const account = await loadAccount(session.user.id);
 
-    // 2. Verifica se tem acesso ativo (demo válido OU subscription active)
+    // 3) Verifica se tem acesso ativo (demo v?lido OU subscription active)
     const { data: accessData, error } = await supabase
       .from('account_access')
       .select('has_access')
       .eq('owner_user_id', session.user.id)
-      .single();
+      .maybeSingle();
 
     if (error || !accessData?.has_access) {
-      // Conta expirada ou demo encerrado → bloqueia app
-      state.account = account; // mantém para mostrar mensagem se quiser
+      // Conta expirada ou demo encerrado ? bloqueia app
+      state.account = account; // mant?m para mostrar mensagem se quiser
       showAccessBlockedScreen(account);
       return;
     }
 
-    // 3. Tem acesso → entra no app normalmente
+    // 4) Tem acesso ? entra no app normalmente
     hideLoginScreen();
 
     state.account = account;
@@ -80,6 +135,7 @@ async function bootstrapUser(session) {
     state.booting = false;
   }
 }
+
 
 function showAccessBlockedScreen(account) {
   hideLoginScreen(); // esconde login

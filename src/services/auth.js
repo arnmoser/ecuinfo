@@ -34,11 +34,17 @@ export async function signOut() {
  * @param {string} password
  * @returns {Promise<{ data, error }>}
  */
-export async function signUpNewUser(email, password) {
-  const { data, error } = await supabase.auth.signUp({
+export async function signUpNewUser(email, password, legalMetadata = null) {
+  const signUpPayload = {
     email,
-    password,
-  });
+    password
+  };
+
+  if (legalMetadata) {
+    signUpPayload.options = { data: legalMetadata };
+  }
+
+  const { data, error } = await supabase.auth.signUp(signUpPayload);
 
   if (error) {
     console.error('Erro no registro:', error.message);
