@@ -28,6 +28,8 @@ body {
   align-items: center;
   justify-content: center;
   padding: 32px;
+  flex-direction: column;
+  gap: 24px;
 }
 
 body.success {
@@ -144,6 +146,22 @@ small {
   margin-top: 40px;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.legal-footer {
+  display: flex;
+  gap: 16px;
+  font-size: 0.85rem;
+}
+
+.legal-footer a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.legal-footer a:hover {
+  color: var(--text);
+  text-decoration: underline;
 }
 
 @media (max-width: 640px) {

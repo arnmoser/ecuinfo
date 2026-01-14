@@ -39,6 +39,20 @@
       <input type="password" name="password" placeholder="Crie uma senha" required />
       <input type="password" name="passwordConfirm" placeholder="Confirme a senha" required />
 
+      <label class="legal-consent">
+        <input type="checkbox" name="acceptLegal" id="acceptLegal" required />
+        <span>
+          Li e concordo com os
+          <a href="src/public/termos-de-uso.html" target="_blank" rel="noopener">Termos de Uso</a>
+          e a
+          <a href="src/public/politica-de-privacidade.html" target="_blank" rel="noopener">Politica de Privacidade</a>.
+        </span>
+      </label>
+      <div class="legal-warning hidden" id="legalWarning">
+        Voce precisa marcar o checkbox de aceite para criar sua conta.
+      </div>
+      <p class="legal-meta" id="registerLegalMeta"></p>
+
       <button type="submit">Criar Conta</button>
 
       <p class="form-toggle-link">
@@ -175,6 +189,50 @@
       </div>
     </div>
   </div>
+
+  <div id="legal-modal-overlay" class="legal-modal-overlay hidden" aria-hidden="true">
+    <div class="legal-modal" role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">
+      <h2 id="legal-modal-title">Atualizamos nossos termos</h2>
+      <p class="legal-text">
+        Para continuar usando o ECU Info, confirme o aceite dos Termos de Uso e da Politica de Privacidade vigentes.
+      </p>
+      <div class="legal-version-grid">
+        <div class="legal-version">
+          <span class="legal-label">Termos de Uso</span>
+          <span class="legal-value">Versao: <strong id="legal-terms-version">-</strong></span>
+          <span class="legal-value">Vigencia: <strong id="legal-terms-effective">-</strong></span>
+        </div>
+        <div class="legal-version">
+          <span class="legal-label">Politica de Privacidade</span>
+          <span class="legal-value">Versao: <strong id="legal-privacy-version">-</strong></span>
+          <span class="legal-value">Vigencia: <strong id="legal-privacy-effective">-</strong></span>
+        </div>
+      </div>
+      <label class="legal-consent">
+        <input type="checkbox" id="legalAcceptCheckbox" />
+        <span>
+          Li e concordo com os
+          <a href="src/public/termos-de-uso.html" target="_blank" rel="noopener">Termos de Uso</a>
+          e a
+          <a href="src/public/politica-de-privacidade.html" target="_blank" rel="noopener">Politica de Privacidade</a>.
+        </span>
+      </label>
+      <div class="legal-actions">
+        <button id="legalAcceptBtn" class="btn-primary" disabled>Continuar</button>
+        <button id="legalLogoutBtn" class="btn-secondary">Sair</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="global-footer">
+    <div class="global-footer-inner">
+      <span>ECU Info</span>
+      <nav>
+        <a href="src/public/termos-de-uso.html" target="_blank" rel="noopener">Termos de Uso</a>
+        <a href="src/public/politica-de-privacidade.html" target="_blank" rel="noopener">Politica de Privacidade</a>
+      </nav>
+    </div>
+  </footer>
 
   <script type="module" src="./src/main.js"></script>
 
