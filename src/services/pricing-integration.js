@@ -3,7 +3,7 @@ import { showToast } from '../ui-toast.js';
 
 const PRICE_IDS = {
   monthly: 'price_1SmL4r3cQaCuy5Qj7WrFli2q',
-  annual: 'price_1Sn0dE3cQaCuy5QjhVzhz2zm'
+  annual: 'price_1Spuyv3cQaCuy5QjEEuibayH'
 };
 
 let pendingCheckout = null;
