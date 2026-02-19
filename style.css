@@ -975,3 +975,34 @@ body {
   display: block;
   white-space: normal;
 }
+
+/* Estilos para módulos de sistema (readonly) */
+.is-readonly input[readonly],
+.is-readonly textarea[readonly] {
+  cursor: not-allowed;
+  background-color: var(--panel-strong);
+  opacity: 0.7;
+}
+
+.is-readonly #deleteModuleBtn,
+.is-readonly .mark-delete {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resize-handle {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.system-module .resize-handle {
+  display: none;
+}
+
+
+
+/* Estilos para modal em módulos de sistema */
+#mark-modal-overlay input[readonly],
+#mark-modal-overlay textarea[readonly] {
+  opacity: 0.7;
+}

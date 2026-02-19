@@ -102,6 +102,7 @@ export function setupGlobalEvents() {
   if (!file) return;
 
   const module = getCurrentModule();
+  if (module?.isSystem) return;
   if (!module) {
     alert('Selecione um módulo antes de adicionar uma imagem.');
     photoInput.value = '';
@@ -206,6 +207,7 @@ export function setupGlobalEvents() {
   /* -------- QUICK EDITS -------- */
   moduleNameInput?.addEventListener('input', () => {
     const module = getCurrentModule();
+    if (module?.isSystem) return;
     if (!module) return;
 
     module.name = moduleNameInput.value;
@@ -216,6 +218,7 @@ export function setupGlobalEvents() {
 
   moduleNotesInput?.addEventListener('input', () => {
     const module = getCurrentModule();
+    if (module?.isSystem) return;
     if (!module) return;
 
     module.notes = moduleNotesInput.value;

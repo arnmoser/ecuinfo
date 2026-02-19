@@ -51,6 +51,18 @@ export async function renderCurrentModule() {
   moduleNameInput.value = mod.name;
   moduleNotesInput.value = mod.notes;
 
+  // Adicionar/remover readonly baseado em isSystem
+  if (mod.isSystem) {
+    moduleNameInput.setAttribute('readonly', true);
+    moduleNotesInput.setAttribute('readonly', true);
+  } else {
+    moduleNameInput.removeAttribute('readonly');
+    moduleNotesInput.removeAttribute('readonly');
+  }
+
+  // Adicionar classe is-readonly ao container principal
+  document.getElementById('app').classList.toggle('is-readonly', mod.isSystem);
+
   // 2. Tratamento para Módulo Novo (Sem Foto)
 if (!mod.photo && !mod.photo_path) {
   stageImg.src = ''; 
@@ -83,9 +95,18 @@ if (!mod.photo && !mod.photo_path) {
   // 3. Lógica de carregamento de imagem (se houver foto)
   if (mod.photo_path) {
     try {
-      const pathClean = String(mod.photo_path).trim().replace(/^\/+/, '');
+      let bucketName = 'ecu_images';
+      let pathClean = '';
+
+      if (mod.isSystem) {
+        bucketName = 'ecu-system';
+        pathClean = String(mod.photo_path).replace(/^system\//, '');
+      } else {
+        pathClean = String(mod.photo_path).trim().replace(/^\/+/, '');
+      }
+
       const { data, error } = await supabase.storage
-        .from('ecu_images')
+        .from(bucketName)
         .createSignedUrl(pathClean, 3600);
       
       if (error) throw error;

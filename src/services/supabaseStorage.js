@@ -32,17 +32,27 @@ function normalizePayload(payload) {
  * Estratégia: Por segurança, mantemos o fallback por um tempo.
  */
 function optimizePayload(payload) {
-  // Deep clone para não afetar o estado da UI imediatamente
+  // 1. Deep clone para não afetar o estado da UI
   const cleanPayload = JSON.parse(JSON.stringify(payload));
-  
+
+  // 2. FILTRO CRÍTICO
+  // Removemos todos os módulos que pertencem ao sistema (isSystem: true)
+  // Assim, o projects.data do usuário conterá APENAS os módulos que ele criou ou clonou.
+  cleanPayload.modules = cleanPayload.modules.filter(mod => !mod.isSystem);
+
+  // 3. Otimização de espaço e limpeza de dados
   cleanPayload.modules.forEach(mod => {
-    // Se existe path no storage, podemos limpar o base64 para economizar espaço no DB
-    // REGRA DE SEGURANÇA: Só limpa se o photo_path for uma string válida
+    // Se o módulo tem um photo_path válido, podemos remover o base64 (photo)
+    // para manter o JSONB leve e performático no PostgreSQL.
     if (mod.photo_path && mod.photo_path.length > 5) {
-      // mod.photo = ""; // Descomente esta linha após testar a migração por alguns dias
+       mod.photo = ""; 
     }
+
+    // Garantimos que campos temporários de UI não sejam salvos
+    delete mod.isSystem; 
+    delete mod.originalSystemId;
   });
-  
+
   return cleanPayload;
 }
 

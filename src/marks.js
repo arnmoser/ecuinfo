@@ -16,6 +16,7 @@ let activeMark = null;
 
 export function addMarkAtClientXY(clientX, clientY, type='point'){
   const mod = getCurrentModule();
+  if (mod?.isSystem) return;
   const content = getStageContent();
   if(!mod || !stage || !content) return;
   const rect = content.getBoundingClientRect();
@@ -67,14 +68,29 @@ export function addMarkAtClientXY(clientX, clientY, type='point'){
 
 /* --- FUNÇÃO LIMPA: Apenas lógica de controle --- */
 export function openTextMarkMenu(mark) {
+    const mod = getCurrentModule();
     // 1. Preenche os inputs com os dados atuais da mark
     titleInput.value = mark.title || '';
     descInput.value = mark.description || '';
     activeMark = mark;
 
+    const isSystem = mod?.isSystem;
+    if (isSystem) {
+      titleInput.setAttribute('readonly', true);
+      descInput.setAttribute('readonly', true);
+      btnSaveMark.style.display = 'none';
+      btnDeleteMark.style.display = 'none';
+    } else {
+      titleInput.removeAttribute('readonly');
+      descInput.removeAttribute('readonly');
+      btnSaveMark.style.display = '';
+      btnDeleteMark.style.display = '';
+    }
+
     // 2. Define o que acontece ao clicar em SALVAR
     // Usamos .onclick para sobrescrever qualquer handler anterior e evitar duplicação
     btnSaveMark.onclick = () => {
+        if (isSystem) return;
         mark.title = titleInput.value;
         mark.description = descInput.value;
         
@@ -93,6 +109,7 @@ export function openTextMarkMenu(mark) {
 
 
     btnDeleteMark.onclick = () => {
+        if (isSystem) return;
   const confirmed = confirm(
     'Tem certeza que deseja deletar esta marcação?\nEssa ação não pode ser desfeita.'
   );
@@ -108,15 +125,30 @@ export function openTextMarkMenu(mark) {
     modalOverlay.classList.remove('hidden');
     
     // 5. Foco no input
-    titleInput.focus();
+    if (!isSystem) titleInput.focus();
 }
 
 export function openPointMarkMenu(mark) {
+    const mod = getCurrentModule();
     titleInput.value = mark.label || '';
     descInput.value = mark.description || '';
     activeMark = mark;
 
+    const isSystem = mod?.isSystem;
+    if (isSystem) {
+      titleInput.setAttribute('readonly', true);
+      descInput.setAttribute('readonly', true);
+      btnSaveMark.style.display = 'none';
+      btnDeleteMark.style.display = 'none';
+    } else {
+      titleInput.removeAttribute('readonly');
+      descInput.removeAttribute('readonly');
+      btnSaveMark.style.display = '';
+      btnDeleteMark.style.display = '';
+    }
+
     btnSaveMark.onclick = () => {
+        if (isSystem) return;
         const newTitle = titleInput.value;
         mark.label = newTitle;
         mark.title = newTitle;
@@ -133,6 +165,7 @@ export function openPointMarkMenu(mark) {
     };
 
     btnDeleteMark.onclick = () => {
+        if (isSystem) return;
         const confirmed = confirm(
             'Tem certeza que deseja deletar esta marcacao?\nEssa acao nao pode ser desfeita.'
         );
@@ -144,7 +177,7 @@ export function openPointMarkMenu(mark) {
     };
 
     modalOverlay.classList.remove('hidden');
-    titleInput.focus();
+    if (!isSystem) titleInput.focus();
 }
 
 function closeModal() {
@@ -153,6 +186,7 @@ function closeModal() {
 
 export function deleteMark(markId){
   const mod = getCurrentModule();
+  if (mod?.isSystem) return;
   if(!mod) return;
   const idx = mod.marks.findIndex(m=>m.id===markId);
   if(idx>=0){
@@ -185,6 +219,8 @@ export function editMarkLabel(mark, labelEl){
 /* MARK DRAG */
 export function startDragMark(ev, mark, el){
   ev.preventDefault();
+  const mod = getCurrentModule();
+  if (mod?.isSystem) return;
   const content = getStageContent();
   if (!content) return;
   const rect = content.getBoundingClientRect();
@@ -283,6 +319,8 @@ let currentDragText = null;
 
 export function startDragTextMark(ev, mark, el) {
   ev.preventDefault();
+  const mod = getCurrentModule();
+  if (mod?.isSystem) return;
 
   const startX = ev.clientX;
   const startY = ev.clientY;
@@ -332,7 +370,7 @@ export function setupTextMarkResize() {
     const handle = e.target;
     const el = handle.parentElement;
     const mod = getCurrentModule();
-    if (!mod) return;
+    if (!mod || mod.isSystem) return;
     const mark = mod.marks.find(m => m.id === el.dataset.markId);
     if (!mark || mark.type !== 'text') return;
 
