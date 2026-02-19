@@ -23,6 +23,8 @@ export function createModule(){
 
 export function deleteCurrentModule(){
   if(!state.currentModuleId) return;
+  const mod = state.modules.find(m=>m.id===state.currentModuleId);
+  if (mod?.isSystem) return;
   const idx = state.modules.findIndex(m=>m.id===state.currentModuleId);
   if(idx>=0){
     if(!confirm('Deletar módulo selecionado?')) return;

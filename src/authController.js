@@ -122,7 +122,7 @@ async function bootstrapUser(session) {
     const project = await loadOrCreateUserProject();
     state.currentProjectId = project.id;
 
-    hydrateStateFromPayload(project.data);
+    await hydrateStateFromPayload(project.data);
     initUI();
     setupLogout();
 
