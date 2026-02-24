@@ -1,106 +1,99 @@
 # AGENTS
 
-## Projeto
-ECU Info e um MVP de sistema web para tecnicos automotivos. O produto permite criar modulos, adicionar fotos, marcar pontos de teste e textos, organizar e buscar informacoes de centrais eletronicas. Interface em HTML, CSS e JavaScript. Backend com Supabase. Pagamentos via Stripe.
+DOCUMENTAÇÃO TÉCNICA: ECU INFO (v2.0)
+1. Visão Geral do Projeto
+O ECU Info é um sistema web (SaaS) projetado para técnicos em eletrônica automotiva. Ele funciona como uma biblioteca técnica interativa onde o usuário pode gerenciar fotos de centrais eletrônicas (ECUs), mapear pontos de teste e consultar manuais. O sistema é construído com tecnologia Fullstack Serverless (HTML/JS puro no Frontend e Supabase no Backend).
 
-## Modelos de assinatura e acesso
+2. Estratégia de Conteúdo e Domínios
+A grande evolução do sistema é a separação entre conteúdo proprietário e conteúdo do usuário:
 
-### 1. Cadastro e trial
-- Todo novo usuario recebe 7 dias de trial completo.
-- Durante o trial: status = 'demo', acesso total ao app.
-- Campos: demo_started_at e demo_expires_at sao preenchidos via trigger no Supabase.
+2.1. Domínio Global (System Modules)
+Fonte: Tabela system_modules (Pública/Read-only).
 
-### 2. Estados da conta
-- 'demo': trial ativo ate demo_expires_at.
-- 'active': assinatura paga ativa ou trial valido.
-- 'expired': trial expirado ou assinatura nao paga/cancelada.
+Identificação: IDs com prefixo mod_sys_.
 
-### 3. Controle de acesso
-- Acesso ao app somente se account_access.has_access = true.
-- Conta 'expired' e bloqueada:
-  - nao ve projetos.
-  - nao entra no app.
-- Dados permanecem salvos e seguros na nuvem.
-- Tela de bloqueio com botao para remarketing.html.
+Comportamento: Módulos oficiais fornecidos pela plataforma. São imutáveis para o usuário.
 
-### 4. Assinatura e pagamento
-- Planos: Mensal e Anual (Stripe).
-- Pagamento via Stripe Checkout.
-- Apos pagamento bem-sucedido:
-  - acesso reativado imediatamente.
-  - status muda para 'active'.
-  - usuario volta ao app.
-- Grace period do Stripe respeitado (acesso ate o fim do ciclo pago).
+Segurança: Protegidos por RLS (Row Level Security) que impede INSERT, UPDATE ou DELETE via frontend.
 
-### 5. Fluxo de reativacao
-- Usuario expirado vai para remarketing.html.
-- Escolhe mensal ou anual.
-- Se nao logado: login e checkout inicia automaticamente.
-- Se logado: vai direto ao checkout.
-- Se assinatura ativa e clicar em assinar: oferecer Customer Portal.
+2.2. Domínio do Usuário (Private Modules)
+Fonte: Campo JSONB na tabela projects.
 
-### 6. Customer Portal
-- Usuario ativo pode:
-  - atualizar cartao
-  - cancelar assinatura
-  - ver invoices
-- Acesso via Edge Function create-portal-session.
+Identificação: IDs dinâmicos gerados no frontend.
 
-### 7. ECU Packs (add-ons)
-- Sao projetos prontos, compra unica (one-time payment).
-- Acesso vitalicio enquanto a assinatura principal estiver ativa.
-- Nao sao consumiveis.
-- Nao ha packs gratis mensais (por enquanto).
+Comportamento: Módulos criados pelo usuário ou clonados do sistema. Totalmente editáveis.
 
-### 8. Seguranca e dados
-- Dados do usuario (projetos, fotos, anotacoes) ficam salvos permanentemente.
-- Mesmo com conta expirada, nada e apagado.
-- RLS ativada nas tabelas principais (projects, etc.) e depende de conta ativa.
+3. Modelo de Dados
+3.1. Project (O Filesystem)
+Cada usuário possui exatamente um projeto.
 
-### 9. Experiencia do usuario (UX)
-- Fluxo sem friccao: nao logado -> login -> checkout automatico.
-- Mensagens claras em caso de erro ou bloqueio.
-- Redirecionamentos inteligentes com contexto preservado.
-- Paginas dedicadas: success.html, cancel.html, remarketing.html.
+Funciona como o container raiz para todos os módulos privados do usuário.
 
-### 10. Tecnico
-- Integracao com Supabase Auth + Stripe Sync Engine.
-- Triggers automaticos para criacao de conta no cadastro.
-- View account_access para verificacao centralizada de acesso.
-- Edge Functions seguras com autenticacao e CORS.
+Sanitização de Payload: Ao salvar, o sistema filtra o estado e remove qualquer dado pertencente ao Domínio Global para evitar redundância no banco.
 
-## Modelo de dados: Project, Module e Mark
+3.2. Module (Unidade de Trabalho)
+Representa uma ECU específica.
 
-### Project
-- Existe exatamente 1 Project por usuario.
-- O usuario nao cria nem gerencia projetos.
-- Container raiz de tudo; define contexto global.
-- Contem todos os Modules e metadados globais.
-- Resumo: Project e o filesystem do usuario.
-
-### Module
-- Unidade real de trabalho.
-- Representa uma ECU, placa ou variacao tecnica.
-- Organiza o trabalho por contexto tecnico.
-- Contem imagem, notas e marks.
-
-Estrutura base:
-```
+JavaScript
 {
-  id: uid('mod'),
-  name: 'Novo Modulo',
-  notes: '',
-  photo: '',
-  marks: []
+  id: "mod_sys_xyz" ou "mod_abc123",
+  name: "Nome da ECU",
+  notes: "Texto com dicas técnicas",
+  photo_path: "caminho_no_storage.png",
+  marks: [],        // Array de objetos Mark
+  isSystem: boolean // Define permissões de UI
 }
-```
+3.3. Mark (Marcação Espacial)
+Pontos de interesse na foto da ECU.
 
-### Mark
-- Entidade filha que so existe dentro de um Module.
-- Anota informacao tecnica com referencia espacial e semantica.
-- Coordenadas percentuais (independentes de zoom/pan).
-- type explicito, label curto, title + description.
-- size desacoplado para controle visual.
+Coordenadas: Percentuais (x, y, width, height) para garantir precisão em qualquer tamanho de tela.
 
-### Relacao final
-Usuario tem 1 Project -> Project organiza Modules -> Modules dao significado as Marks.
+Tipos: Texto, alimentação, sinal, aterramento, etc.
+
+UI Lock: Marks em módulos globais têm eventos de arrastar/redimensionar bloqueados.
+
+4. Assinatura e Controle de Acesso
+4.1. Estados da Conta
+'demo': Trial de 7 dias (calculado via triggers no Supabase).
+
+'active': Assinatura Stripe em dia.
+
+'expired': Fim do trial ou inadimplência. Bloqueia o acesso ao app e redireciona para remarketing.html.
+
+4.2. Integração Stripe
+Pagamentos: Stripe Checkout (Planos Mensal/Anual).
+
+Sincronização: Stripe Sync Engine + Edge Functions.
+
+Customer Portal: Permite gestão de cartões e cancelamentos via create-portal-session.
+
+5. Fluxos Especiais
+5.1. Mecanismo de Clonagem
+Permite que o usuário torne um módulo do sistema "seu":
+
+O sistema copia a imagem do bucket ecu-system para o bucket ecu_images.
+
+Gera-se um novo registro no domínio do usuário sem a flag isSystem.
+
+5.2. Otimização de Storage
+Imagens oficiais ficam no bucket protegido ecu-system.
+
+Imagens de usuários ficam no bucket ecu_images.
+
+O sistema remove strings em Base64 assim que o upload é concluído para manter o banco de dados leve.
+
+6. UX e Interface (Blindagem)
+Feedback Visual: Módulos globais exibem cursor not-allowed em campos de texto e marcas fixas.
+
+Acesso Fluido: Usuários expirados podem visualizar planos e assinar sem necessidade de novo login (contexto preservado).
+
+7. Pilha Técnica
+Frontend: Vanilla JS, CSS3 (variáveis e flexbox), HTML5.
+
+Backend: Supabase (Auth, PostgreSQL, Storage, Edge Functions).
+
+Pagamentos: Stripe API.
+
+Infra: Cloudflare Pages (Hosting).
+
+Atualizado em: 2026-02-24

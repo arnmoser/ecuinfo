@@ -63,11 +63,35 @@ export function setupAuthForms() {
   // --- Lógica do formulário de Login ---
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const email = loginForm.email.value;
+    const password = loginForm.password.value;
+    const submitButton = loginForm.querySelector('button[type="submit"]');
+
     try {
-      // TODO: Adicionar feedback de "carregando" no botão
-      await signInWithEmail(loginForm.email.value, loginForm.password.value);
-    } catch {
-      showToast('Email ou senha inválidos.', { type: 'error' });
+      submitButton.disabled = true;
+      submitButton.textContent = 'Entrando...';
+      await signInWithEmail(email, password);
+    } catch (error) {
+      console.error('[Login Error]', error);
+
+      const { message } = error;
+      let userMessage = 'Ocorreu um erro inesperado. Tente novamente.';
+
+      // Mapeamento de erros da API do Supabase
+      if (message.includes('Invalid login credentials')) {
+        userMessage = 'Email ou senha inválidos.';
+      } else if (message.includes('Email not confirmed')) {
+        userMessage = 'Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada.';
+      } else if (message.includes('rate limit exceeded')) {
+        userMessage = 'Muitas tentativas de login. Tente novamente em alguns minutos.';
+      } else if (error.name === 'TypeError' || message.includes('fetch')) {
+        userMessage = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      }
+
+      showToast(userMessage, { type: 'error' });
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Entrar';
     }
   });
 
