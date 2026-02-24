@@ -2,8 +2,8 @@ import { supabase } from './supabase.js';
 import { showToast } from '../ui-toast.js';
 
 const PRICE_IDS = {
-  monthly: 'price_1Sspfz3SsQLqnAO2stY5kyg5',
-  annual: 'price_1Sspfs3SsQLqnAO2IIqJp6H6'
+  monthly: 'price_1T4OH53SsQLqnAO2yb5vnOQH',
+  annual: 'price_1T4Oaa3SsQLqnAO2aAaN0eR5'
 };
 
 let pendingCheckout = null;
