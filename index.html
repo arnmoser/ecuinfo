@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -7,6 +8,7 @@
 
   <link rel="icon" href="favicon.png" />
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="src/mobile/mobile-style.css">
 </head>
 
 <body>
@@ -25,7 +27,7 @@
       <button type="submit">Entrar</button>
 
       <p class="form-toggle-link">
-        Não possui uma conta? 
+        Não possui uma conta?
         <a href="landing.html" id="showRegister">Crie uma agora</a>
       </p>
     </form>
@@ -56,7 +58,7 @@
       <button type="submit">Criar Conta</button>
 
       <p class="form-toggle-link">
-        Já possui uma conta? 
+        Já possui uma conta?
         <a href="#" id="showLogin">Faça o login</a>
       </p>
     </form>
@@ -70,7 +72,7 @@
         <h1>ECU INFO - Gerenciamento de ECUs</h1>
         <button id="newModuleBtn">+ Novo Módulo</button>
       </header>
-     
+
       <div class="search-box">
         <input id="moduleSearch" placeholder="Buscar módulos / labels..." />
       </div>
@@ -155,6 +157,76 @@
     </main>
   </div>
 
+  <!-- MOBILE APP (read-only) -->
+  <div id="mobile-app" class="hidden">
+    <!-- Lista de módulos stack -->
+    <div id="mobile-list-view" class="mobile-view active">
+      <header class="mobile-header">
+        <h1>ECU INFO</h1>
+        <div class="mobile-search-box">
+          <input id="mobileModuleSearch" placeholder="Buscar módulos / labels..." />
+        </div>
+      </header>
+      <div class="mobile-content">
+        <ul id="mobileModuleList" class="mobile-module-list"></ul>
+      </div>
+    </div>
+
+    <!-- Detalhes do módulo -->
+    <div id="mobile-detail-view" class="mobile-view">
+      <header class="mobile-header detail-header">
+        <button id="mobileBackBtn" class="mobile-btn" onclick="window.goBackToMobileList()"
+          ontouchstart="window.goBackToMobileList()">← Voltar</button>
+        <h2 id="mobileDetailTitle">Módulo</h2>
+      </header>
+      <div class="mobile-content mobile-detail-content">
+        <div class="mobile-image-wrap">
+          <img id="mobileStageImg" src="" alt="ECU Photo">
+          <!-- As marcas poderiam ser renderizadas aqui de forma simplificada num futuro, ou só texto dependendo da necessidade, mas colocaremos a camada -->
+          <div id="mobileMarksLayer" class="mobile-marks-layer"></div>
+        </div>
+
+        <div class="mobile-info-section">
+          <h3>Notas Técnicas</h3>
+          <p id="mobileNotesText" class="mobile-notes-text">Nenhuma nota disponível.</p>
+        </div>
+
+        <div class="mobile-marks-list-section">
+          <h3>Marcações</h3>
+          <ul id="mobileMarksList" class="mobile-marks-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Visualização Técnica Expandida -->
+    <div id="mobile-image-modal" class="mobile-modal">
+      <header class="mobile-modal-header">
+        <button id="mobileModalCloseBtn" class="mobile-btn">✕ Fechar</button>
+        <span class="mobile-modal-title">Visualização Técnica</span>
+      </header>
+      <div id="mobileModalPanZoom" class="mobile-modal-body">
+        <div class="mobile-modal-stage">
+          <img id="mobileModalImg" src="" alt="Expanded ECU">
+          <div id="mobileModalMarksLayer" class="mobile-marks-layer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Informações da Marcação (Bottom Sheet) -->
+    <div id="mobile-mark-info-modal" class="mobile-bottom-sheet">
+      <div class="mobile-bottom-sheet-content">
+        <div class="mobile-bottom-sheet-drag-handle"></div>
+        <header class="mobile-bottom-sheet-header">
+          <h3 id="mobileMarkInfoTitle">Título da Marcação</h3>
+          <button id="mobileMarkInfoCloseBtn" class="mobile-icon-btn">✕</button>
+        </header>
+        <div class="mobile-bottom-sheet-body">
+          <p id="mobileMarkInfoDesc">Descrição detalhada vai aqui.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TEMPLATES -->
   <template id="moduleItemTpl">
     <li class="module-item">
@@ -235,6 +307,8 @@
   </footer>
 
   <script type="module" src="./src/main.js"></script>
+  <script type="module" src="./src/mobile/mobile-ui.js"></script>
 
 </body>
+
 </html>
