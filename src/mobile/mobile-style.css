@@ -1,0 +1,536 @@
+/* src/mobile/mobile-style.css - Redesigned SaaS 2026 Experience */
+
+/* Reset & Isolation when Mobile Mode is Active */
+body.is-mobile {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Prevent desktop scroll leaking */
+  width: 100vw;
+  height: 100vh;
+  background-color: #0b0e0c;
+  /* Deep premium dark */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #f0f4f2;
+}
+
+body.is-mobile #app {
+  display: none !important;
+  /* Total removal of desktop tree from layout */
+}
+
+/* Base Mobile App Container */
+#mobile-app {
+  display: none;
+  /* Hidden by default */
+  width: 100%;
+  height: 100vh;
+  flex-direction: column;
+  background-color: #0b0e0c;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+body.is-mobile #mobile-app.active {
+  display: flex !important;
+}
+
+/* Views Management */
+.mobile-view {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #0b0e0c;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s 0.3s;
+  z-index: 1;
+}
+
+.mobile-view.active {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+/* ======== HEADER & SEARCH ======== */
+.mobile-header {
+  padding: 24px 20px 16px;
+  background: rgba(11, 14, 12, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.mobile-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 16px 0;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.mobile-search-box input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-size: 16px;
+  /* Prevents iOS auto-zoom */
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-search-box input:focus {
+  border-color: #3eea9c;
+  background: rgba(62, 234, 156, 0.05);
+}
+
+.mobile-search-box input::placeholder {
+  color: #6e7a75;
+}
+
+/* ======== CONTENT AREA ======== */
+.mobile-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px;
+  padding-bottom: 80px;
+  /* Safe space at bottom */
+}
+
+/* ======== LIST VIEW (CARDS) ======== */
+.mobile-module-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobile-module-card {
+  background: linear-gradient(145deg, #151a18 0%, #111514 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-module-card::after {
+  content: '→';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #3eea9c;
+  opacity: 0;
+  transition: opacity 0.2s, right 0.2s;
+  font-size: 18px;
+}
+
+.mobile-module-card:active {
+  transform: scale(0.98);
+  background: #19201d;
+  border-color: rgba(62, 234, 156, 0.3);
+}
+
+.mobile-module-card:active::after {
+  opacity: 1;
+  right: 16px;
+}
+
+.mobile-module-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  padding-right: 24px;
+}
+
+.mobile-module-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #8d9894;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mobile-module-card p::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f28b3c;
+  box-shadow: 0 0 6px rgba(242, 139, 60, 0.4);
+}
+
+/* ======== DETAIL VIEW ======== */
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.mobile-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f0f4f2;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto !important;
+}
+
+.mobile-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#mobileBackBtn {
+  z-index: 99999;
+  position: relative;
+  pointer-events: auto !important;
+}
+
+#mobileDetailTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.mobile-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Image Wrapper Premium */
+.mobile-image-wrap {
+  width: 100%;
+  aspect-ratio: 4/3;
+  flex-shrink: 0;
+  background: #080a09;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  cursor: zoom-in;
+}
+
+#mobileStageImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.mobile-marks-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Info & Marks Sections */
+.mobile-info-section,
+.mobile-marks-list-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.mobile-info-section h3,
+.mobile-marks-list-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #3eea9c;
+  font-weight: 700;
+}
+
+.mobile-notes-text {
+  margin: 0;
+  font-size: 15px;
+  color: #d8dedb;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Marks List Enhanced */
+.mobile-marks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-marks-list li {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobile-mark-title {
+  font-weight: 600;
+  color: #fff;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-mark-title::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #f28b3c;
+}
+
+.mobile-mark-desc {
+  color: #9aa5a1;
+  font-size: 14px;
+  line-height: 1.5;
+  padding-left: 18px;
+  /* Alignment with title text */
+}
+
+/* No-image state fallback */
+.mobile-no-image {
+  color: #6e7a75;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-no-image i {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+/* ======== IMAGE MODAL (EXPANDED VIEW) ======== */
+.mobile-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-modal-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 20px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.mobile-modal-header .mobile-btn {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.mobile-modal-title {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.mobile-modal-body {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* We handle panning via transform scale, not native scroll layout */
+  position: relative;
+  display: flex;
+}
+
+.mobile-modal-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: top left;
+}
+
+/* Base style for the image inside the modal. 
+   It will stretch naturally based on JS calculation or its intrinsic width, 
+   ensuring zoom pan capability without restricted heights. */
+#mobileModalImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+/* We hide the original thumbnail image marks to draw native marks cleanly over the image wrap */
+.mobile-image-wrap {
+  cursor: zoom-in;
+}
+
+/* ======== MARK INFO BOTTOM SHEET ======== */
+.mobile-bottom-sheet {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999999;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-bottom-sheet.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mobile-bottom-sheet-content {
+  width: 100%;
+  background: #111514;
+  /* Match card gradient base */
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-bottom-sheet.active .mobile-bottom-sheet-content {
+  transform: translateY(0);
+}
+
+.mobile-bottom-sheet-drag-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  margin: -12px auto 20px;
+}
+
+.mobile-bottom-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.mobile-bottom-sheet-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  padding-right: 16px;
+  line-height: 1.3;
+}
+
+.mobile-icon-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: #9aa5a1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mobile-icon-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.mobile-bottom-sheet-body p {
+  margin: 0;
+  font-size: 15px;
+  color: #d8dedb;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
