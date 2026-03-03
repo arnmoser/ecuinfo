@@ -275,7 +275,7 @@ function setupZoomEvents() {
 // ======================================
 // 3. Viewport Detection & Isolation
 // ======================================
-function handleResize() {
+export function handleResize() {
   const width = window.innerWidth;
   const shouldBeMobile = width < MOBILE_BREAKPOINT;
 
