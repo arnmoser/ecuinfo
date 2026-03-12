@@ -1,5 +1,6 @@
 import { signInWithEmail, signUpNewUser } from './services/auth.js';
 import { showToast } from './ui-toast.js';
+import { normalizeWhatsApp, isValidWhatsApp } from './utils.js';
 import {
   buildAcceptancePayload,
   getCurrentLegalVersions,
@@ -103,6 +104,8 @@ export function setupAuthForms() {
     const password = registerForm.password.value;
     const passwordConfirm = registerForm.passwordConfirm.value;
     const acceptLegal = registerForm.acceptLegal;
+    const whatsappInput = registerForm.whatsapp.value;
+    const acceptMarketing = registerForm.whatsappMarketing?.checked;
 
     if (password.length < 6) {
       showToast('A senha deve ter no mínimo 6 caracteres.', { type: 'error' });
@@ -111,8 +114,8 @@ export function setupAuthForms() {
 
     if (password !== passwordConfirm) {
       showToast('As senhas não coincidem.', { type: 'error' });
-    return;
-  }
+      return;
+    }
 
     if (!acceptLegal?.checked) {
       showToast('VocÇ¦ precisa aceitar os Termos de Uso e a PolÇðtica de Privacidade.', { type: 'error' });
@@ -129,24 +132,35 @@ export function setupAuthForms() {
       return;
     }
 
-  try {
-    const legalVersions = await getCurrentLegalVersions();
-    const legalPayload = buildAcceptancePayload(legalVersions);
-    const { error } = await signUpNewUser(email, password, legalPayload);
-    if (error) {
-      showToast(`Erro no registro: ${error.message}`, { type: 'error' });
+    const normalizedWhatsapp = normalizeWhatsApp(whatsappInput);
+    if (!isValidWhatsApp(normalizedWhatsapp)) {
+      showToast('Por favor, informe um número de WhatsApp válido.', { type: 'error' });
+      registerForm.whatsapp?.focus();
+      return;
+    }
+
+    const whatsappData = {
+      whatsapp: normalizedWhatsapp,
+      whatsapp_marketing_consent: acceptMarketing || false,
+      whatsapp_marketing_consent_at: acceptMarketing ? new Date().toISOString() : null
+    };
+
+    try {
+      const legalVersions = await getCurrentLegalVersions();
+      const legalPayload = buildAcceptancePayload(legalVersions);
+
+      const { error } = await signUpNewUser(email, password, legalPayload, whatsappData);
+      if (error) {
+        showToast(`Erro no registro: ${error.message}`, { type: 'error' });
       } else {
         savePendingLegalAcceptance(legalPayload);
-        showToast('Registro realizado! Verifique seu e-mail para confirmar a conta.', { type: 'success', duration: 6000 });
+        showToast('Conta criada com sucesso! Entrando...', { type: 'success', duration: 4000 });
         registerForm.reset();
         if (acceptLegal) {
           acceptLegal.checked = false;
           const submitBtn = registerForm.querySelector('button[type="submit"]');
           if (submitBtn) submitBtn.disabled = true;
         }
-        // Volta para a tela de login
-        registerForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
       }
     } catch (err) {
       showToast('Ocorreu um erro inesperado. Tente novamente.', { type: 'error' });
