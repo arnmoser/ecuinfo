@@ -34,7 +34,7 @@ export async function signOut() {
  * @param {string} password
  * @returns {Promise<{ data, error }>}
  */
-export async function signUpNewUser(email, password, legalMetadata = null) {
+export async function signUpNewUser(email, password, legalMetadata = null, whatsappData = null) {
   const signUpPayload = {
     email,
     password
@@ -48,8 +48,42 @@ export async function signUpNewUser(email, password, legalMetadata = null) {
 
   if (error) {
     console.error('Erro no registro:', error.message);
+    return { data, error };
   }
-  // O feedback ao usuário foi movido para a camada de UI (ui-login.js)
 
-  return { data, error };
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (signInError) {
+    console.error('Erro no auto-login pós-registro:', signInError.message);
+    return { data, error: signInError };
+  }
+
+  if (signInData?.user && whatsappData) {
+    // Buscar o usuário autenticado conforme exigido
+    const { data: authData, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !authData?.user) {
+      console.error('Erro ao recuperar usuário autenticado:', userError?.message);
+      return { data: signInData, error: userError || new Error('Usuário não validado') };
+    }
+
+    const { error: updateError } = await supabase.from('accounts')
+      .update({
+        whatsapp: whatsappData.whatsapp,
+        whatsapp_marketing_consent: whatsappData.whatsapp_marketing_consent,
+        whatsapp_marketing_consent_at: whatsappData.whatsapp_marketing_consent_at
+      })
+      .eq('owner_user_id', authData.user.id);
+
+    if (updateError) {
+      console.error('Erro ao atualizar dados do WhatsApp:', updateError.message);
+      return { data: signInData, error: updateError };
+    }
+  }
+  // O feedback ao usuário é dado na camada de UI (ui-login.js)
+
+  return { data: signInData, error: null };
 }

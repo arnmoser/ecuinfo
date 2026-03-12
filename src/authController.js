@@ -100,7 +100,7 @@ async function bootstrapUser(session) {
     // 2) Carrega dados da conta
     const account = await loadAccount(session.user.id);
 
-    // 3) Verifica se tem acesso ativo (demo v?lido OU subscription active)
+    // 3) Verifica se tem acesso ativo (demo válido OU subscription active)
     const { data: accessData, error } = await supabase
       .from('account_access')
       .select('has_access')
@@ -114,7 +114,7 @@ async function bootstrapUser(session) {
       return;
     }
 
-    // 4) Tem acesso ? entra no app normalmente
+    // 5) Tem acesso ? entra no app normalmente
     hideLoginScreen();
 
     state.account = account;
