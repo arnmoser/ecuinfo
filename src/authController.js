@@ -140,6 +140,10 @@ async function bootstrapUser(session) {
 function showAccessBlockedScreen(account) {
   hideLoginScreen(); // esconde login
 
+  // Remover tela anterior caso exista para evitar duplicidade
+  const existingScreen = document.getElementById('access-blocked');
+  if (existingScreen) existingScreen.remove();
+
   // Cria tela de bloqueio simples (pode estilizar depois)
   document.body.insertAdjacentHTML('beforeend', `
     <div id="access-blocked" style="
@@ -161,14 +165,30 @@ function showAccessBlockedScreen(account) {
       <p>Seus projetos estão salvos e seguros.</p>
       <p>Para continuar usando o ECU Info, escolha um plano:</p>
       <div style="margin: 2rem 0; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-        <button onclick="location.href='src/public/remarketing.html#plans'" style="padding: 1rem 2rem; font-size: 1.1rem; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer;">
+        <button id="blocked-plans-btn" style="padding: 1rem 2rem; font-size: 1.1rem; background: #22c55e; color: white; border: none; border-radius: 8px; cursor: pointer;">
           Ver Planos e Reativar
         </button>
-        <button onclick="supabase.auth.signOut()" style="padding: 1rem 2rem; font-size: 1.1rem; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer;">
+        <button id="blocked-logout-btn" style="padding: 1rem 2rem; font-size: 1.1rem; background: #475569; color: white; border: none; border-radius: 8px; cursor: pointer;">
           Sair
         </button>
       </div>
       <small>Obrigado por testar o ECU Info!</small>
     </div>
   `);
+
+  document.getElementById('blocked-plans-btn').addEventListener('click', () => {
+    location.href = 'src/public/remarketing.html#plans';
+  });
+
+  document.getElementById('blocked-logout-btn').addEventListener('click', async () => {
+    try {
+      // O evento de onAuthStateChange do Supabase ('SIGNED_OUT') vai ser disparado por isso
+      // e handleAuthEvent() limpará o state e mostrará a tela de login.
+      await supabase.auth.signOut();
+      document.getElementById('access-blocked')?.remove();
+    } catch (err) {
+      console.error('Erro ao sair:', err);
+      showToast('Erro ao realizar logout. Tente novamente.', { type: 'error' });
+    }
+  });
 }

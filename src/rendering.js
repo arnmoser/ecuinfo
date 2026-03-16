@@ -41,7 +41,10 @@ export function renderModuleList() {
 export async function renderCurrentModule() {
   const mod = getCurrentModule();
 
-  // 1. Limpeza imediata da camada de marcas (evita fantasmas)
+  // 1. Mostrar estado de carregamento e limpar marcas
+  const loaderEl = document.getElementById('moduleLoader');
+  if (loaderEl) loaderEl.classList.remove('hidden');
+
   marksLayer.innerHTML = '';
 
   if (!mod) {
@@ -65,10 +68,21 @@ export async function renderCurrentModule() {
   }
 
   // Adicionar classe is-readonly ao container principal
-  document.getElementById('app').classList.toggle('is-readonly', mod.isSystem);
+  document.getElementById('app').classList.toggle('is-readonly', !!mod.isSystem);
+
+  // Garantir que o botão real seja desativado logicamente também
+  const deleteBtn = document.getElementById('deleteModuleBtn');
+  if (deleteBtn) {
+    if (mod.isSystem) {
+      deleteBtn.setAttribute('disabled', 'true');
+    } else {
+      deleteBtn.removeAttribute('disabled');
+    }
+  }
 
   // 2. Tratamento para Módulo Novo (Sem Foto)
   if (!mod.photo && !mod.photo_path) {
+    if (loaderEl) loaderEl.classList.add('hidden');
     stageImg.src = '';
 
     // Limpa as marcas antigas
@@ -124,7 +138,13 @@ export async function renderCurrentModule() {
 
   // 4. Renderização das marcas (Só ocorre se a imagem carregar com sucesso)
   stageImg.onload = () => {
+    if (loaderEl) loaderEl.classList.add('hidden');
     renderMarks();
+  };
+
+  // Tratativa para falha de carregamento da imagem ou ausências não detectadas
+  stageImg.onerror = () => {
+    if (loaderEl) loaderEl.classList.add('hidden');
   };
 
   // Sincroniza a camada mobile isolada

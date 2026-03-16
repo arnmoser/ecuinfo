@@ -41,7 +41,8 @@
       <input type="password" name="password" placeholder="Crie uma senha" required />
       <input type="password" name="passwordConfirm" placeholder="Confirme a senha" required />
 
-      <input type="tel" name="whatsapp" placeholder="WhatsApp (ex: 47 99999-9999)" required />
+      <input type="tel" name="whatsapp" placeholder="WhatsApp (ex: 47 99999-9999)" required
+        oninvalid="this.setCustomValidity('Por favor, preencha seu WhatsApp.')" oninput="this.setCustomValidity('')" />
       <div class="field-hint form-subtitle"
         style="text-align: left; font-size: 0.85em; opacity: 0.8; margin-top: -8px; margin-bottom: 8px; margin-left: 2px;">
         Usaremos seu WhatsApp para avisos importantes sobre sua conta.</div>
@@ -87,6 +88,8 @@
 
       <div class="search-box">
         <input id="moduleSearch" placeholder="Buscar módulos / labels..." />
+
+
       </div>
 
       <ul id="moduleList" class="module-list"></ul>
@@ -150,6 +153,11 @@
 
         <div class="stage-wrap">
           <div id="stage" class="stage">
+            <!-- Loader Desktop -->
+            <div id="moduleLoader" class="module-loader hidden">
+              <div class="spinner"></div>
+              <span>Carregando Módulo...</span>
+            </div>
             <div id="stageContent">
               <img id="stageImg" src="" alt="ECU Photo">
               <div id="marksLayer" class="marks-layer"></div>
@@ -177,6 +185,7 @@
         <h1>ECU INFO</h1>
         <div class="mobile-search-box">
           <input id="mobileModuleSearch" placeholder="Buscar módulos / labels..." />
+
         </div>
       </header>
       <div class="mobile-content">
@@ -193,6 +202,10 @@
       </header>
       <div class="mobile-content mobile-detail-content">
         <div class="mobile-image-wrap">
+          <!-- Loader Mobile -->
+          <div id="mobileModuleLoader" class="module-loader hidden">
+            <div class="spinner"></div>
+          </div>
           <img id="mobileStageImg" src="" alt="ECU Photo">
           <!-- As marcas poderiam ser renderizadas aqui de forma simplificada num futuro, ou só texto dependendo da necessidade, mas colocaremos a camada -->
           <div id="mobileMarksLayer" class="mobile-marks-layer"></div>

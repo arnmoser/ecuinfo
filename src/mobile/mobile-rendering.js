@@ -57,8 +57,11 @@ export async function renderMobileCurrentModule() {
     const imgEl = document.getElementById('mobileStageImg');
     const marksListEl = document.getElementById('mobileMarksList');
     const marksLayerEl = document.getElementById('mobileMarksLayer');
+    const loaderEl = document.getElementById('mobileModuleLoader');
 
     if (!titleEl || !mod) return;
+
+    if (loaderEl) loaderEl.classList.remove('hidden');
 
     // 1. Text & Info
     titleEl.textContent = mod.name || 'Módulo';
@@ -100,6 +103,7 @@ export async function renderMobileCurrentModule() {
 
     if (!hasPhotoPath && !hasLocalPhoto) {
         // Fallback Visual
+        if (loaderEl) loaderEl.classList.add('hidden');
         imgEl.style.display = 'none';
         const fallback = document.createElement('div');
         fallback.className = 'mobile-no-image';
@@ -112,6 +116,7 @@ export async function renderMobileCurrentModule() {
 
     // Define loading behavior - resilient to cache
     const drawMarks = () => {
+        if (loaderEl) loaderEl.classList.add('hidden');
         // Use requestAnimationFrame to let CSS paint the actual heights before we measure boxes
         requestAnimationFrame(() => {
             renderMobileMarksStrict(mod, imgEl, marksLayerEl);
@@ -119,6 +124,7 @@ export async function renderMobileCurrentModule() {
     };
 
     imgEl.onload = drawMarks;
+    imgEl.onerror = () => { if (loaderEl) loaderEl.classList.add('hidden'); };
 
 
     // Trigger Supabase fetch or use Local Base64
