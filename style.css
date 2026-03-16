@@ -1187,3 +1187,67 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* =========================================
+   TOGGLE SWITCH - Filtro de Módulos
+   ========================================= */
+.modern-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  margin-top: 12px;
+  user-select: none;
+}
+
+.modern-switch-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.modern-switch-slider {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: #1f2623;
+  border: 1px solid #2a3330;
+  border-radius: 999px;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.modern-switch-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #6e7a75;
+  border-radius: 50%;
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.modern-switch-input:checked+.modern-switch-slider {
+  background: rgba(62, 234, 156, 0.18);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(62, 234, 156, 0.2);
+}
+
+.modern-switch-input:checked+.modern-switch-slider::after {
+  transform: translateX(18px);
+  background: var(--accent);
+}
+
+.modern-switch-label {
+  font-size: 12px;
+  color: #9aa5a1;
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
+}
+
+.modern-switch-input:checked~.modern-switch-label {
+  color: var(--accent);
+}

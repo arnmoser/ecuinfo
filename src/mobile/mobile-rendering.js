@@ -18,6 +18,10 @@ export function renderMobileModuleList() {
     }
 
     state.modules.forEach(mod => {
+        // Filtro: Mostrar Apenas Meus Módulos
+        const mobileFilter = document.getElementById('mobileFilterMyModules');
+        if (mobileFilter?.checked && mod.isSystem) return;
+
         // Filter logic
         const matchesName = (mod.name || '').toLowerCase().includes(q);
         const matchesMark = mod.marks && mod.marks.some(mk => (mk.label || '').toLowerCase().includes(q) || (mk.title || '').toLowerCase().includes(q));
