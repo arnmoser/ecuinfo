@@ -2,7 +2,8 @@
 import { state, getCurrentModule } from './state.js';
 import {
   moduleListEl, moduleSearch, moduleTpl, moduleNameInput,
-  moduleNotesInput, stageImg, marksLayer, markTpl, quickSearch
+  moduleNotesInput, stageImg, marksLayer, markTpl, quickSearch,
+  filterMyModules
 } from './dom.js';
 import { saveToStorage } from './storage.js';
 import { editMarkLabel, startDragMark, openTextMarkMenu, openPointMarkMenu } from './marks.js';
@@ -15,6 +16,9 @@ export function renderModuleList() {
   const q = moduleSearch.value.trim().toLowerCase();
   moduleListEl.innerHTML = '';
   state.modules.forEach(mod => {
+    // Filtro: Mostrar Apenas Meus Módulos
+    if (filterMyModules?.checked && mod.isSystem) return;
+
     // filter by module name or marks labels if search active
     const matchesName = mod.name.toLowerCase().includes(q);
     const matchesMark = mod.marks && mod.marks.some(mk => (mk.label || '').toLowerCase().includes(q));

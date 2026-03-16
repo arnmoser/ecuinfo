@@ -354,6 +354,13 @@ export function setupMobileEvents() {
     });
   }
 
+  const mobileFilter = document.getElementById('mobileFilterMyModules');
+  if (mobileFilter) {
+    mobileFilter.addEventListener('change', () => {
+      renderMobileModuleList();
+    });
+  }
+
   const mCloseBtn = document.getElementById('mobileModalCloseBtn');
   if (mCloseBtn) {
     mCloseBtn.addEventListener('click', closeMobileImageModal);

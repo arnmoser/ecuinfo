@@ -12,7 +12,8 @@ import {
   moduleNotesInput,
   moduleSearch,
   quickSearch,
-  btnSaveProject
+  btnSaveProject,
+  filterMyModules
 } from './dom.js';
 
 import { createModule, deleteCurrentModule } from './modules.js';
@@ -38,7 +39,7 @@ async function handleSaveProject() {
   state.modules.forEach(mod => {
     if (mod.photo_path && mod.photo && mod.photo.startsWith('data:image')) {
       console.log(`[Otimização] Removendo Base64 do módulo: ${mod.name}`);
-      mod.photo = ""; 
+      mod.photo = "";
     }
   });
   // ------------------------------------------------------------------
@@ -98,63 +99,63 @@ export function setupGlobalEvents() {
 
   /* -------- IMAGE UPLOAD -------- */
   photoInput?.addEventListener('change', async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-  const module = getCurrentModule();
-  if (module?.isSystem) return;
-  if (!module) {
-    alert('Selecione um módulo antes de adicionar uma imagem.');
-    photoInput.value = '';
-    return;
-  }
-
-  // GARANTIA: Se o projeto é novo e não tem ID, precisamos salvar o projeto 
-  // no DB primeiro para gerar um ID, OU usar um placeholder.
-  // Vamos garantir que state.currentProjectId existe:
-  if (!state.currentProjectId) {
-    try {
-       // Força a criação do projeto no DB para obter o ID real antes do upload da foto
-       const payload = saveToStorage();
-       await saveProjectToSupabase(payload); 
-    } catch (err) {
-       alert("Erro ao preparar projeto para receber imagem. Tente salvar o projeto uma vez antes.");
-       return;
+    const module = getCurrentModule();
+    if (module?.isSystem) return;
+    if (!module) {
+      alert('Selecione um módulo antes de adicionar uma imagem.');
+      photoInput.value = '';
+      return;
     }
-  }
 
-  try {
-    const userId = String(state.user.id).trim();
-    const projectId = String(state.currentProjectId).trim();
-    const moduleId = String(module.id).trim();
-    const fileExt = file.name.split('.').pop().toLowerCase();
-    
-    // Caminho limpo: evita barras duplas ou espaços
-    const filePath = `${userId}/${projectId}/${moduleId}.${fileExt}`;
+    // GARANTIA: Se o projeto é novo e não tem ID, precisamos salvar o projeto 
+    // no DB primeiro para gerar um ID, OU usar um placeholder.
+    // Vamos garantir que state.currentProjectId existe:
+    if (!state.currentProjectId) {
+      try {
+        // Força a criação do projeto no DB para obter o ID real antes do upload da foto
+        const payload = saveToStorage();
+        await saveProjectToSupabase(payload);
+      } catch (err) {
+        alert("Erro ao preparar projeto para receber imagem. Tente salvar o projeto uma vez antes.");
+        return;
+      }
+    }
+
+    try {
+      const userId = String(state.user.id).trim();
+      const projectId = String(state.currentProjectId).trim();
+      const moduleId = String(module.id).trim();
+      const fileExt = file.name.split('.').pop().toLowerCase();
+
+      // Caminho limpo: evita barras duplas ou espaços
+      const filePath = `${userId}/${projectId}/${moduleId}.${fileExt}`;
 
 
-    const { data, error: uploadError } = await supabase.storage
-      .from('ecu_images')
-      .upload(filePath, file, { 
+      const { data, error: uploadError } = await supabase.storage
+        .from('ecu_images')
+        .upload(filePath, file, {
           upsert: true,
           contentType: file.type // Ajuda o navegador a identificar o arquivo
-      });
+        });
 
-    if (uploadError) throw uploadError;
+      if (uploadError) throw uploadError;
 
-    module.photo = await fileToDataURL(file); 
-    module.photo_path = filePath; 
+      module.photo = await fileToDataURL(file);
+      module.photo_path = filePath;
 
-    state.dirty = true;
-    syncSaveButton();
-    renderCurrentModule();
-  } catch (err) {
-    console.error('Erro no upload:', err);
-    alert(`Erro: ${err.message}`);
-  } finally {
-    photoInput.value = '';
-  }
-});
+      state.dirty = true;
+      syncSaveButton();
+      renderCurrentModule();
+    } catch (err) {
+      console.error('Erro no upload:', err);
+      alert(`Erro: ${err.message}`);
+    } finally {
+      photoInput.value = '';
+    }
+  });
 
   /* -------- EXPORT -------- */
   exportBtn?.addEventListener('click', () => {
@@ -229,6 +230,9 @@ export function setupGlobalEvents() {
   /* -------- SEARCH -------- */
   moduleSearch?.addEventListener('input', renderModuleList);
   quickSearch?.addEventListener('input', renderMarks);
+
+  /* -------- FILTER: Meus Módulos -------- */
+  filterMyModules?.addEventListener('change', renderModuleList);
 
   /* -------- UNSAVED WARNING -------- */
   window.addEventListener('beforeunload', (e) => {
