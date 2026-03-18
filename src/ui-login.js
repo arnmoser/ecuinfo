@@ -8,6 +8,8 @@ import {
   savePendingLegalAcceptance
 } from './services/legalService.js';
 
+const POST_LOGIN_TARGET_KEY = 'ecuinfo_post_login_target';
+
 function getUI() {
   return {
     loginWrapper: document.getElementById('login'),
@@ -71,8 +73,10 @@ export function setupAuthForms() {
     try {
       submitButton.disabled = true;
       submitButton.textContent = 'Entrando...';
+      sessionStorage.setItem(POST_LOGIN_TARGET_KEY, 'dashboard');
       await signInWithEmail(email, password);
     } catch (error) {
+      sessionStorage.removeItem(POST_LOGIN_TARGET_KEY);
       console.error('[Login Error]', error);
 
       const { message } = error;

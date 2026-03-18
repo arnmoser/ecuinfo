@@ -17,6 +17,8 @@ import {
 } from './services/legalService.js';
 import { hideLegalAcceptanceModal, showLegalAcceptanceModal } from './ui-legal.js';
 
+const POST_LOGIN_TARGET_KEY = 'ecuinfo_post_login_target';
+
 // Canal para sincronização entre abas
 const authChannel = new BroadcastChannel('ecuinfo-auth-channel');
 
@@ -41,6 +43,13 @@ export async function handleAuthEvent(event, session) {
   if (event !== 'SIGNED_IN' && event !== 'TOKEN_REFRESHED' && event !== 'INITIAL_SESSION') return;
 
   await bootstrapUser(session);
+}
+
+function shouldRedirectToDashboard() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('from') === 'checkout') return false;
+  if (params.get('entry') === 'ecu') return false;
+  return sessionStorage.getItem(POST_LOGIN_TARGET_KEY) === 'dashboard';
 }
 
 async function bootstrapUser(session) {
@@ -111,6 +120,12 @@ async function bootstrapUser(session) {
       // Conta expirada ou demo encerrado ? bloqueia app
       state.account = account; // mant?m para mostrar mensagem se quiser
       showAccessBlockedScreen(account);
+      return;
+    }
+
+    if (shouldRedirectToDashboard()) {
+      sessionStorage.removeItem(POST_LOGIN_TARGET_KEY);
+      window.location.href = 'src/public/dashboard.html';
       return;
     }
 
