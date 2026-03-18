@@ -4,6 +4,10 @@ node_modules
 .env.*.local
 dist
 build
+coverage
+.trae
+supabase/.temp
+*.log
 .vscode
 .DS_Store
 .AGENTS
