@@ -107,35 +107,15 @@
         </div>
 
         <div class="top-actions">
-          <div class="action-group" role="group" aria-label="Acoes do projeto">
+          <div class="action-group action-group--project" role="group" aria-label="Acoes do projeto">
             <button id="manageSubscriptionBtn" class="tool">Gerenciar Assinatura</button>
             <a id="openHexEditorLink" class="tool" href="src/public/hex-editor.html"
               style="display:inline-flex;align-items:center;text-decoration:none;">Hex Editor</a>
-            <button id="saveProjectBtn" class="tool" disabled>Salvar Projetos</button>
-            <label class="btn">
-              Adicionar Foto
+            <button id="saveProjectBtn" class="tool tool--primary" disabled>Salvar Projetos</button>
+            <label class="btn btn--photo">
+              <span aria-hidden="true">📷</span> Adicionar Foto
               <input id="photoInput" type="file" accept="image/*" hidden>
             </label>
-          </div>
-
-          <div class="mark-tools" role="group" aria-label="Criar Marcacoes">
-            <div class="mark-tools-header">
-              <div class="mark-tools-title">Criar Marcacoes</div>
-              <div class="mark-tools-hint">
-                Escolha o tipo de marcacao e clique e mantenha o mouse pressionado por 2 segundos no local desejado.
-              </div>
-            </div>
-            <div class="mark-tools-toggle" role="group" aria-label="Tipo de marcacao">
-              <div class="mark-tools-label">Selecione o tipo de marcacao:</div>
-              <div class="mark-tools-options">
-                <button id="toolPoint" class="tool active">Pino</button>
-                <button id="toolText" class="tool">Componente</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="action-group" role="group" aria-label="Sessao">
-            <button id="logoutBtn" class="tool danger">Sair</button>
           </div>
         </div>
       </div>
@@ -147,10 +127,25 @@
             <input id="moduleName" placeholder="Digite o nome do módulo aqui" />
             <div class="field-hint">Ex.: ECU Delphi MT80, ABS Bosch 8.0</div>
           </div>
-          <div class="field-group">
-            <label for="moduleNotes">Notas técnicas</label>
-            <textarea id="moduleNotes" placeholder="Adicione observações, testes e detalhes importantes"></textarea>
-            <div class="field-hint">Use este espaço para procedimentos, medidas e referências.</div>
+          <div class="field-group notes-editor">
+            <div class="notes-head">
+              <label for="moduleNotes">Notas técnicas</label>
+              <span class="autosave-ind" id="notesAutosave" title="Indicador visual — o salvamento real continua pelo botão Salvar Projetos">
+                <span class="autosave-dot"></span><span class="autosave-text">Salvo automaticamente</span>
+              </span>
+            </div>
+            <div class="notes-tabs" role="tablist" aria-label="Organizar notas por seção">
+              <button type="button" class="notes-tab active" data-notes-tab="spec" role="tab">Especificações</button>
+              <button type="button" class="notes-tab" data-notes-tab="proc" role="tab">Procedimentos</button>
+              <button type="button" class="notes-tab" data-notes-tab="pin" role="tab">Pinagem</button>
+            </div>
+            <div class="notes-toolbar" role="toolbar" aria-label="Formatação (texto simples)">
+              <button type="button" data-fmt="bold" title="Negrito (marcações **)"><b>B</b></button>
+              <button type="button" data-fmt="italic" title="Itálico (marcações *)"><i>I</i></button>
+              <button type="button" data-fmt="table" title="Inserir tabela">▦</button>
+            </div>
+            <textarea id="moduleNotes" class="notes-area" placeholder="Adicione observações, testes e detalhes importantes"></textarea>
+            <div class="field-hint">Abas e formatação são organizadores visuais — o texto salvo continua único.</div>
           </div>
           <div class="info-actions">
             <button id="deleteModuleBtn" class="danger">Deletar módulo</button>
@@ -158,6 +153,20 @@
         </aside>
 
         <div class="stage-wrap">
+          <div class="mark-tools mark-tools--float" role="group" aria-label="Criar Marcacoes">
+            <div class="mark-tools-header">
+              <div class="mark-tools-title">Criar marcações</div>
+              <div class="mark-tools-hint">
+                Escolha o tipo e clique e segure por ~1s no ponto desejado da placa.
+              </div>
+            </div>
+            <div class="mark-tools-toggle" role="group" aria-label="Tipo de marcacao">
+              <div class="mark-tools-options">
+                <button id="toolPoint" class="tool active">📍 Pino</button>
+                <button id="toolText" class="tool">⬛ Componente</button>
+              </div>
+            </div>
+          </div>
           <div id="stage" class="stage">
             <!-- Loader Desktop -->
             <div id="moduleLoader" class="module-loader hidden">
@@ -181,6 +190,10 @@
         </div>
       </section>
     </main>
+
+    <footer class="sidebar-footer">
+      <button id="logoutBtn" class="sidebar-logout" title="Encerrar sessão">⇲ Sair</button>
+    </footer>
   </div>
 
   <!-- MOBILE APP (read-only) -->

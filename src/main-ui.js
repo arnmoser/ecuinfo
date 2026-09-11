@@ -5,6 +5,7 @@ import {
 import { applyTransform, setupStagePanZoom } from './stage.js';
 import { setupMarkCreationEvents } from './marks.js';
 import { setupGlobalEvents } from './events.js';
+import { setupNotesEditor } from './notes-editor.js';
 import { handleResize } from './mobile/mobile-ui.js';
 
 export function initUI() {
@@ -17,6 +18,7 @@ export function initUI() {
   setupGlobalEvents();
   setupStagePanZoom();
   setupMarkCreationEvents();
+  setupNotesEditor();
 
   // Evaluate the screen width and auto-boot Mobile mode if on phone
   handleResize();
