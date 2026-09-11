@@ -170,6 +170,7 @@
   <div class="container">
     <span>ECU Info — Soluções técnicas para reparadores automotivos</span>
     <nav>
+      <a href="#" data-support>Falar com suporte</a>
       <a href="termos-de-uso.html">Termos de Uso</a>
       <a href="politica-de-privacidade.html">Politica de Privacidade</a>
     </nav>
@@ -180,6 +181,11 @@
 <script type="module">
   import { supabase } from '../services/supabase.js';
   import { setupPricingButtons, openCustomerPortal } from '../services/pricing-integration.js';
+  import { applySupportLinks } from '../support.js';
+  import { initAnalytics } from '../analytics.js';
+
+  initAnalytics();
+  applySupportLinks();
 
   function scrollToAnchorIfAny() {
     const hash = window.location.hash;

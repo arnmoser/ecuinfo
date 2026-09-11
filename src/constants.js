@@ -12,3 +12,15 @@ export const LEGAL_DEFAULTS = {
 };
 
 export const LEGAL_STORAGE_KEY = 'ecuinfo_pending_legal_acceptance';
+
+/* Suporte: número WhatsApp com DDI+DDD só dígitos (ex: '5547999999999').
+ * Preencha para exibir os botões "Falar com suporte" (sucesso, remarketing,
+ * tela de bloqueio e rodapé). Vazio = botões ficam ocultos. */
+export const SUPPORT_WHATSAPP = '';
+
+export const SUPPORT_MESSAGE = 'Olá! Preciso de ajuda com meu acesso ao ECU Info.';
+
+/* Analytics: preencha para ativar (vazio = desativado, nada é carregado).
+ * GA4: 'G-XXXXXXXXXX' | Meta Pixel: só dígitos (ex: '1234567890') */
+export const GA4_MEASUREMENT_ID = '';
+export const META_PIXEL_ID = '';

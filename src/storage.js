@@ -60,6 +60,13 @@ export function saveToStorage() {
     return payload; // CRÍTICO: usado pelo Supabase
   } catch (err) {
     console.error('[storage] Erro ao salvar dados locais', err);
+    // Preserva o motivo (ex.: cota excedida) para mensagem amigável na UI
+    if (err?.name === 'QuotaExceededError' || err?.code === 22) {
+      const quota = new Error('QUOTA_EXCEEDED');
+      quota.name = 'QuotaExceededError';
+      quota.code = 'QUOTA_EXCEEDED';
+      throw quota;
+    }
     throw err; // deixa quem chamou decidir o que fazer
   }
 }

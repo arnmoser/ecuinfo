@@ -1,4 +1,5 @@
 import { signOut } from './services/auth.js';
+import { showToast } from './ui-toast.js';
 
 export function setupLogout() {
   const btn = document.getElementById('logoutBtn');
@@ -10,7 +11,7 @@ export function setupLogout() {
       // NÃO faz nada aqui
       // O onAuthStateChange vai cuidar da UI
     } catch {
-      alert('Erro ao sair');
+      showToast('Erro ao sair. Tente novamente.', { type: 'error' });
     }
   });
 }

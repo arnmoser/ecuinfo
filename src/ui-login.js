@@ -1,5 +1,6 @@
 import { signInWithEmail, signUpNewUser } from './services/auth.js';
 import { showToast } from './ui-toast.js';
+import { track } from './analytics.js';
 import { normalizeWhatsApp, isValidWhatsApp } from './utils.js';
 import {
   buildAcceptancePayload,
@@ -158,6 +159,7 @@ export function setupAuthForms() {
         showToast(`Erro no registro: ${error.message}`, { type: 'error' });
       } else {
         savePendingLegalAcceptance(legalPayload);
+        track('sign_up', { method: 'email' });
         showToast('Conta criada com sucesso! Entrando...', { type: 'success', duration: 4000 });
         registerForm.reset();
         if (acceptLegal) {

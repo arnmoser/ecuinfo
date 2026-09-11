@@ -16,6 +16,7 @@ import {
   recordLegalAcceptance
 } from './services/legalService.js';
 import { hideLegalAcceptanceModal, showLegalAcceptanceModal } from './ui-legal.js';
+import { applySupportLinks } from './support.js';
 
 const POST_LOGIN_TARGET_KEY = 'ecuinfo_post_login_target';
 
@@ -188,8 +189,11 @@ function showAccessBlockedScreen(account) {
         </button>
       </div>
       <small>Obrigado por testar o ECU Info!</small>
+      <p style="margin-top:1rem;"><a href="#" data-support style="color:#7fd79f;">Precisa de ajuda? Falar com suporte</a></p>
     </div>
   `);
+
+  applySupportLinks(document.getElementById('access-blocked'));
 
   document.getElementById('blocked-plans-btn').addEventListener('click', () => {
     location.href = 'src/public/remarketing.html#plans';

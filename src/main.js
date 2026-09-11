@@ -2,6 +2,8 @@ import { supabase } from './services/supabase.js';
 import { handleAuthEvent } from './authController.js';
 import { showLoginScreen, setupAuthForms, showAuthScreen } from './ui-login.js';
 import { setupLogout } from './ui-logout.js';
+import { applySupportLinks } from './support.js';
+import { initAnalytics } from './analytics.js';
 
 /**
  * Decide qual tela de autenticação mostrar com base nos parâmetros da URL.
@@ -26,6 +28,8 @@ function boot() {
   routeInitialAuthScreen();
   setupAuthForms();
   setupLogout();
+  applySupportLinks();
+  initAnalytics();
 
   // Escuta as mudanças de estado de autenticação (login, logout)
   supabase.auth.onAuthStateChange((event, session) => {

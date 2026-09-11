@@ -4,6 +4,7 @@ import { uid } from './utils.js';
 import { saveToStorage } from './storage.js';
 import { renderModuleList, renderCurrentModule } from './rendering.js';
 import { syncSaveButton } from './ui-modal.js';
+import { confirmDialog } from './ui-confirm.js';
 
 export function createModule(){
   const m = {
@@ -21,13 +22,17 @@ export function createModule(){
   renderCurrentModule();
 }
 
-export function deleteCurrentModule(){
+export async function deleteCurrentModule(){
   if(!state.currentModuleId) return;
   const mod = state.modules.find(m=>m.id===state.currentModuleId);
   if (mod?.isSystem) return;
   const idx = state.modules.findIndex(m=>m.id===state.currentModuleId);
   if(idx>=0){
-    if(!confirm('Deletar módulo selecionado?')) return;
+    const ok = await confirmDialog(`Deletar o módulo "${mod?.name || 'sem nome'}"?`, {
+      confirmLabel: 'Deletar',
+      cancelLabel: 'Manter'
+    });
+    if(!ok) return;
     state.modules.splice(idx,1);
     state.currentModuleId = state.modules[0] ? state.modules[0].id : null;
     state.dirty = true;

@@ -28,9 +28,17 @@ import {
 import { syncSaveButton } from './ui-modal.js';
 import { saveProjectToSupabase } from './services/supabaseStorage.js';
 import { supabase } from './services/supabase.js';
+import { showToast } from './ui-toast.js';
 /* ======================
    SAVE HANDLER
    ====================== */
+
+function friendlyStorageError(err) {
+  if (err?.name === 'QuotaExceededError' || err?.code === 'QUOTA_EXCEEDED') {
+    return 'Armazenamento local cheio. Remova fotos/módulos antigos ou salve o projeto para liberar espaço.';
+  }
+  return 'Erro ao salvar localmente.';
+}
 
 async function handleSaveProject() {
   if (!state.dirty) return;
@@ -51,7 +59,7 @@ async function handleSaveProject() {
     payload = saveToStorage();
   } catch (err) {
     console.error('[local] Falha ao salvar', err);
-    alert('Erro ao salvar localmente.');
+    showToast(friendlyStorageError(err), { type: 'error', duration: 6000 });
     return;
   }
 
@@ -61,7 +69,7 @@ async function handleSaveProject() {
     console.log('[remote] Projeto sincronizado e otimizado');
   } catch (err) {
     console.error('[remote] Falha ao sincronizar', err);
-    alert('Projeto salvo localmente, mas não foi possível sincronizar.');
+    showToast('Projeto salvo localmente, mas não foi possível sincronizar.', { type: 'error', duration: 6000 });
   }
 
   state.dirty = false;
@@ -105,7 +113,7 @@ export function setupGlobalEvents() {
     const module = getCurrentModule();
     if (module?.isSystem) return;
     if (!module) {
-      alert('Selecione um módulo antes de adicionar uma imagem.');
+      showToast('Selecione um módulo antes de adicionar uma imagem.', { type: 'error' });
       photoInput.value = '';
       return;
     }
@@ -119,7 +127,7 @@ export function setupGlobalEvents() {
         const payload = saveToStorage();
         await saveProjectToSupabase(payload);
       } catch (err) {
-        alert("Erro ao preparar projeto para receber imagem. Tente salvar o projeto uma vez antes.");
+        showToast('Erro ao preparar projeto para receber imagem. Tente salvar o projeto uma vez antes.', { type: 'error', duration: 6000 });
         return;
       }
     }
@@ -129,7 +137,7 @@ export function setupGlobalEvents() {
       // O atributo accept="image/*" do HTML é só dica de UI e é burlável.
       const validation = await validateImageFile(file);
       if (!validation.ok) {
-        alert(validation.error);
+        showToast(validation.error, { type: 'error', duration: 6000 });
         photoInput.value = '';
         return;
       }
@@ -161,7 +169,7 @@ export function setupGlobalEvents() {
       renderCurrentModule();
     } catch (err) {
       console.error('Erro no upload:', err);
-      alert(`Erro: ${err.message}`);
+      showToast(`Erro no upload: ${err.message}`, { type: 'error', duration: 6000 });
     } finally {
       photoInput.value = '';
     }
@@ -212,9 +220,9 @@ export function setupGlobalEvents() {
       renderModuleList();
       renderCurrentModule();
 
-      alert('Importação concluída.');
+      showToast('Importação concluída.', { type: 'success' });
     } catch (err) {
-      alert('Falha ao importar: ' + err.message);
+      showToast('Falha ao importar: ' + err.message, { type: 'error', duration: 6000 });
     } finally {
       importInput.value = '';
     }

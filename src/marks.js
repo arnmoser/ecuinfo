@@ -7,6 +7,7 @@ import { MARK_HOLD_TIME, HOLD_MOVE_TOLERANCE } from './constants.js';
 import { modalOverlay, titleInput, descInput, btnSaveMark, btnCancelMark } from './dom.js';
 import { syncSaveButton } from './ui-modal.js';
 import { btnDeleteMark } from './dom.js';
+import { confirmDialog } from './ui-confirm.js';
 
 
 let markPressTimer = null;
@@ -108,10 +109,11 @@ export function openTextMarkMenu(mark) {
     };
 
 
-    btnDeleteMark.onclick = () => {
+    btnDeleteMark.onclick = async () => {
         if (isSystem) return;
-  const confirmed = confirm(
-    'Tem certeza que deseja deletar esta marcação?\nEssa ação não pode ser desfeita.'
+  const confirmed = await confirmDialog(
+    'Tem certeza que deseja deletar esta marcação? Essa ação não pode ser desfeita.',
+    { confirmLabel: 'Deletar', cancelLabel: 'Manter' }
   );
 
   if (!confirmed) return;
@@ -164,10 +166,11 @@ export function openPointMarkMenu(mark) {
         closeModal();
     };
 
-    btnDeleteMark.onclick = () => {
+    btnDeleteMark.onclick = async () => {
         if (isSystem) return;
-        const confirmed = confirm(
-            'Tem certeza que deseja deletar esta marcacao?\nEssa acao nao pode ser desfeita.'
+        const confirmed = await confirmDialog(
+            'Tem certeza que deseja deletar esta marcação? Essa ação não pode ser desfeita.',
+            { confirmLabel: 'Deletar', cancelLabel: 'Manter' }
         );
 
         if (!confirmed) return;

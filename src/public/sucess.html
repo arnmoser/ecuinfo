@@ -32,11 +32,17 @@
       <div class="actions" id="actions-area" style="display: none;">
         <a href="/index.html" class="btn-primary">Ir para o App</a>
       </div>
+      <p style="margin-top:16px;font-size:14px;"><a href="#" data-support>Falar com suporte no WhatsApp</a></p>
     </div>
   </div>
 
   <script type="module">
     import { supabase } from '../services/supabase.js';
+    import { applySupportLinks } from '../support.js';
+    import { initAnalytics, track } from '../analytics.js';
+
+    initAnalytics();
+    applySupportLinks();
 
     const maxAttempts = 15; // 15 tentativas * 2 segundos = 30 segundos
     let attempt = 0;
@@ -61,7 +67,7 @@
 
         if (access && access.has_access) {
           clearInterval(intervalId);
-          
+          track('purchase');
           // Notifica outras abas para recarregarem
           authChannel.postMessage({ type: 'RELOAD_STATUS' });
 
