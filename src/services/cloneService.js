@@ -14,6 +14,16 @@ export async function cloneSystemModule(systemModule) {
 
     const originalPath = systemModule.photo_path.replace(/^system\//, '');
 
+    // SEGURANÇA: photo_path vem do banco; barra traversal e paths absolutos
+    // antes de usar como chave do Storage.
+    if (
+      originalPath.includes('..') ||
+      originalPath.startsWith('/') ||
+      !/^[A-Za-z0-9 _\-/]+\.[A-Za-z0-9]{2,5}$/.test(originalPath)
+    ) {
+      throw new Error('photo_path do módulo do sistema é inválido.');
+    }
+
     const { data, error } = await supabase.storage
       .from('ecu-system')
       .download(originalPath);

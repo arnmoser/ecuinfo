@@ -19,7 +19,25 @@ async function bootstrapHexEditor() {
   } catch (error) {
     allowed = false;
   }
-  initHexEditor(root, { allowed });
+  // FAIL-CLOSED: sem direito, nem inicializa o editor (nenhum handler de
+  // arquivo, view ou atalho é criado) — só a tela de bloqueio com CTA.
+  // Limitação honesta: o processamento é 100% local, então esta barreira é
+  // de UX/receita, não um perímetro de segurança (não há dado de servidor
+  // em jogo). O gating real de dados continua no RLS + account_access.
+  if (!allowed) {
+    root.innerHTML = `
+      <main class="hex-access-denied" style="max-width:640px;margin:8rem auto;text-align:center;font-family:system-ui,sans-serif;padding:0 1.5rem;">
+        <h1>Editor Hexadecimal — plano ativo necessário</h1>
+        <p>Sua assinatura precisa estar ativa para usar esta ferramenta.</p>
+        <button type="button" data-action="plans" style="padding:.9rem 2rem;font-size:1rem;cursor:pointer;">Ver Planos</button>
+      </main>
+    `;
+    root.querySelector('[data-action="plans"]')?.addEventListener('click', () => {
+      window.location.href = './remarketing.html#plans';
+    });
+    return;
+  }
+  initHexEditor(root, { allowed: true });
 }
 
 bootstrapHexEditor();

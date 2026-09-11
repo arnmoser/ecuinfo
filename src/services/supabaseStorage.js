@@ -102,6 +102,8 @@ export async function saveProjectToSupabase(payload) {
   }
 
   // UPDATE
+  // Defesa em profundidade: filtra também pelo dono (a RLS já barra, mas o
+  // código não deve depender só dela para não vazar/atualizar dados alheios).
   const { data, error } = await supabase
     .from('projects')
     .update({
@@ -110,6 +112,7 @@ export async function saveProjectToSupabase(payload) {
       updated_at: new Date().toISOString()
     })
     .eq('id', state.currentProjectId)
+    .eq('user_id', state.user.id)
     .select('id')
     .single();
 
@@ -134,6 +137,7 @@ export async function loadProjectFromSupabase(projectId) {
     .from('projects')
     .select('data')
     .eq('id', projectId)
+    .eq('user_id', state.user.id)
     .single();
 
   if (error) {
@@ -154,6 +158,7 @@ export async function listProjectsFromSupabase() {
   const { data, error } = await supabase
     .from('projects')
     .select('id, name, created_at')
+    .eq('user_id', state.user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -178,7 +183,8 @@ export async function deleteProjectFromSupabase(projectId) {
   const { error } = await supabase
     .from('projects')
     .delete()
-    .eq('id', projectId);
+    .eq('id', projectId)
+    .eq('user_id', state.user.id);
 
   if (error) {
     const handled = await handleSupabaseError(error);
@@ -202,6 +208,7 @@ export async function getProjectsFromSupabase() {
   const { data, error } = await supabase
     .from('projects')
     .select('id, data, updated_at')
+    .eq('user_id', state.user.id)
     .order('updated_at', { ascending: false })
     .limit(1);
 
@@ -236,6 +243,7 @@ export async function loadOrCreateUserProject() {
   const { data, error } = await supabase
     .from('projects')
     .select('id, data')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false }) 
     .limit(1)
     .maybeSingle();

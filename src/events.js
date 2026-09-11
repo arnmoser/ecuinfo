@@ -18,7 +18,7 @@ import {
 
 import { createModule, deleteCurrentModule } from './modules.js';
 import { state, getCurrentModule } from './state.js';
-import { fileToDataURL } from './utils.js';
+import { fileToDataURL, validateImageFile, validateImportPayload, MAX_IMPORT_JSON_BYTES } from './utils.js';
 import { saveToStorage } from './storage.js';
 import {
   renderCurrentModule,
@@ -125,10 +125,20 @@ export function setupGlobalEvents() {
     }
 
     try {
+      // SEGURANÇA: valida MIME (allowlist), tamanho e magic bytes reais.
+      // O atributo accept="image/*" do HTML é só dica de UI e é burlável.
+      const validation = await validateImageFile(file);
+      if (!validation.ok) {
+        alert(validation.error);
+        photoInput.value = '';
+        return;
+      }
+
       const userId = String(state.user.id).trim();
       const projectId = String(state.currentProjectId).trim();
       const moduleId = String(module.id).trim();
-      const fileExt = file.name.split('.').pop().toLowerCase();
+      // Extensão derivada do MIME validado — nunca de file.name (controlado pelo usuário)
+      const fileExt = validation.ext;
 
       // Caminho limpo: evita barras duplas ou espaços
       const filePath = `${userId}/${projectId}/${moduleId}.${fileExt}`;
@@ -138,7 +148,7 @@ export function setupGlobalEvents() {
         .from('ecu_images')
         .upload(filePath, file, {
           upsert: true,
-          contentType: file.type // Ajuda o navegador a identificar o arquivo
+          contentType: validation.mime // MIME validado, não o file.type cru
         });
 
       if (uploadError) throw uploadError;
@@ -182,11 +192,16 @@ export function setupGlobalEvents() {
     if (!file) return;
 
     try {
+      if (file.size > MAX_IMPORT_JSON_BYTES) {
+        throw new Error('Arquivo excede o limite de 25 MB.');
+      }
       const text = await file.text();
       const parsed = JSON.parse(text);
 
-      if (!Array.isArray(parsed.modules)) {
-        throw new Error('Formato inválido');
+      // SEGURANÇA: valida schema antes de injetar no state
+      const validation = validateImportPayload(parsed);
+      if (!validation.ok) {
+        throw new Error(validation.error);
       }
 
       state.modules = parsed.modules;

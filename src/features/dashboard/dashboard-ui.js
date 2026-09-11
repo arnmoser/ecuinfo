@@ -7,7 +7,7 @@ export function renderDashboard(root, model) {
           <h1>Escolha o subsistema</h1>
           <p class="dashboard-subtitle">Acesse rapidamente as ferramentas da plataforma.</p>
           <div class="dashboard-header-actions">
-            <p class="dashboard-user">${model.userLabel}</p>
+            <p class="dashboard-user" data-user-label></p>
             <button type="button" class="dashboard-manage-btn" data-action="plans">Gerenciar Planos</button>
           </div>
         </header>
@@ -26,4 +26,7 @@ export function renderDashboard(root, model) {
       </section>
     </main>
   `;
+  // SEGURANÇA: userLabel (e-mail da sessão) via textContent, nunca interpolado no HTML.
+  const userEl = root.querySelector('[data-user-label]');
+  if (userEl) userEl.textContent = model.userLabel ?? '';
 }
