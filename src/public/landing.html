@@ -3,14 +3,106 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A ferramenta definitiva para reparadores de ECU. Mapeie pinouts, salve fotos de reparos e crie seu próprio banco de dados técnico." />
-  <title>ECU Info | Inteligência para sua Bancada</title>
+  <meta name="description" content="Caderno de bancada digital para quem repara ECU. Fotografe a placa, marque os pontos, registre o defeito e a solução. Já vem com mais de 30 ECUs mapeadas." />
+  <title>ECU Info | Caderno de bancada para reparo de centrais</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="landing.css">
+
+  <style>
+    .compare-section { padding: 5rem 0; }
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 3rem;
+    }
+    @media (max-width: 780px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-card {
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+    }
+    .compare-card.bad { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.05); }
+    .compare-card.good { border-color: rgba(34,197,94,0.25); background: rgba(34,197,94,0.05); }
+    .compare-card h3 { font-size: 1.15rem; margin-bottom: 1.25rem; letter-spacing: 0.02em; }
+    .compare-card.bad h3 { color: #f87171; }
+    .compare-card.good h3 { color: #4ade80; }
+    .compare-card ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.85rem; }
+    .compare-card li { display: flex; gap: 0.65rem; line-height: 1.5; font-size: 0.95rem; color: #cbd5e1; }
+    .compare-card li::before { content: "—"; flex-shrink: 0; opacity: 0.5; }
+    .compare-card.good li::before { content: "✓"; color: #4ade80; opacity: 1; font-weight: 700; }
+    .compare-card.bad li::before { content: "✕"; color: #f87171; opacity: 1; font-weight: 700; }
+
+    .ecu-catalog { display: grid; gap: 2.5rem; margin-top: 3rem; }
+    .ecu-brand h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #94a3b8;
+      margin-bottom: 0.9rem;
+      font-weight: 600;
+    }
+    .ecu-brand .ecu-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .ecu-brand .ecu-tags span {
+      display: inline-block;
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      transition: all 0.2s ease;
+    }
+    .ecu-brand .ecu-tags span:hover {
+      border-color: rgba(34,197,94,0.4);
+      background: rgba(34,197,94,0.08);
+      color: #4ade80;
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 3rem;
+    }
+    .faq-card {
+      border-radius: 14px;
+      padding: 1.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.02);
+      transition: border-color 0.25s ease, transform 0.25s ease;
+    }
+    .faq-card:hover { border-color: rgba(34,197,94,0.35); transform: translateY(-3px); }
+    .faq-card h3 {
+      font-size: 1.02rem;
+      color: #f1f5f9;
+      margin-bottom: 0.75rem;
+      line-height: 1.35;
+      font-weight: 600;
+    }
+    .faq-card h3::before {
+      content: "?";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: rgba(34,197,94,0.15);
+      color: #4ade80;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-right: 0.65rem;
+      vertical-align: middle;
+    }
+    .faq-card p { color: #94a3b8; line-height: 1.6; font-size: 0.93rem; margin: 0; }
+  </style>
 </head>
 <body>
 
@@ -22,467 +114,476 @@
     <div class="hero-text">
       <div class="hero-badge">
         <span class="pulse-dot"></span>
-        <span>Sistema para Reparadores de Centrais</span>
+        <span>+30 ECUs já mapeadas no cadastro</span>
       </div>
       <h1>
-        Não confie apenas na memória.<br>
-        <span class="gradient-text">Domine seus reparos.</span>
+        Você já resolveu esse defeito.<br>
+        <span class="gradient-text">Só não lembra onde anotou.</span>
       </h1>
       <p>
-        Pare de perder tempo procurando o mesmo componente duas vezes. Mapeie componentes, salve fotos da placa e crie sua própria enciclopédia técnica de módulos automotivos.
+        O ECU Info é o caderno de bancada digital para quem repara central.
+        Fotografe a placa, marque os pontos, registre o defeito e a solução.
+        Na próxima vez que o módulo chegar, tudo aparece na tela em segundos.
+        E você já começa com <strong>mais de 30 ECUs mapeadas</strong>.
       </p>
 
       <div class="hero-actions">
-
         <a href="../../index.html?intent=register" class="cta-button primary">
-
-          <span>Criar Conta Grátis</span>
-
+          <span>Criar conta grátis</span>
           <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-
           </svg>
-
         </a>
-
         <a href="../../index.html?intent=login" class="cta-button primary">
-
           <span>Já tenho conta</span>
-
         </a>
-
       </div>
 
-            <div class="trust-badge">
+      <div class="trust-badge">
+        <span class="check-icon">✓</span> 7 dias grátis • Sem cartão • Sem instalação
+      </div>
+    </div>
 
-              <span class="check-icon">✓</span> 7 dias grátis • Sem cartão de crédito
-
-            </div>
-
+    <div class="hero-mockup">
+      <div class="mockup-frame">
+        <div class="mockup-header">
+          <div class="dots-group">
+            <span class="mockup-dot red"></span>
+            <span class="mockup-dot yellow"></span>
+            <span class="mockup-dot green"></span>
           </div>
-
-      
-
-          <div class="hero-mockup">
-
-            <div class="mockup-frame">
-
-              <div class="mockup-header">
-
-                <div class="dots-group">
-
-                  <span class="mockup-dot red"></span>
-
-                  <span class="mockup-dot yellow"></span>
-
-                  <span class="mockup-dot green"></span>
-
-                </div>
-
-                <div class="address-bar">ecu-info/workbench/bosch-me7</div>
-
+          <div class="address-bar">ecu-info/workbench/bosch-me7</div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-ui">
+            <div class="ui-sidebar">
+              <div class="skeleton-line w-70"></div>
+              <div class="skeleton-line w-50"></div>
+              <div class="skeleton-line w-80"></div>
+            </div>
+            <div class="ui-main">
+              <div class="ui-image-placeholder">
+                <span class="chip-label">CPU</span>
               </div>
-
-              <div class="mockup-body">
-
-                <div class="mockup-ui">
-
-                  <div class="ui-sidebar">
-
-                    <div class="skeleton-line w-70"></div>
-
-                    <div class="skeleton-line w-50"></div>
-
-                    <div class="skeleton-line w-80"></div>
-
-                  </div>
-
-                  <div class="ui-main">
-
-                    <div class="ui-image-placeholder">
-
-                      <span class="chip-label">CPU</span>
-
-                    </div>
-
-                    <div class="ui-annotations">
-
-                      <div class="annotation pin1">
-
-                        <span class="pin-dot"></span>
-
-                        <strong>Processador:</strong> ST10F
-
-                      </div>
-
-                      <div class="annotation pin2">
-
-                        <span class="pin-dot"></span>
-
-                        <strong>Defeito comum: Solda Fria</strong>
-
-                      </div>
-
-                      <svg class="trace-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
-
-                        <path d="M40 35 L50 45" stroke="#22c55e" stroke-width="2" fill="none" class="dashed-line"/>
-
-                      </svg>
-
-                    </div>
-
-                  </div>
-
+              <div class="ui-annotations">
+                <div class="annotation pin1">
+                  <span class="pin-dot"></span>
+                  <strong>Processador:</strong> ST10F
                 </div>
-
+                <div class="annotation pin2">
+                  <span class="pin-dot"></span>
+                  <strong>Defeito comum: Solda fria</strong>
+                </div>
+                <svg class="trace-lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  <path d="M40 35 L50 45" stroke="#22c55e" stroke-width="2" fill="none" class="dashed-line"/>
+                </svg>
               </div>
-
             </div>
-
-            <div class="mockup-glow"></div>
-
           </div>
-
         </div>
+      </div>
+      <div class="mockup-glow"></div>
+    </div>
+  </div>
+</header>
 
-      </header>
+<main>
 
-      
+<section id="benefits" class="benefits-section">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-item">
+        <span class="stat-number">+30 ECUs</span>
+        <span class="stat-label">Já liberadas na hora do cadastro. Bosch, Siemens, Magneti Marelli, Delphi, Denso, Valeo e outras.</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">Sem retrabalho</span>
+        <span class="stat-label">Não precisa reabrir o módulo só pra lembrar o que fez. Não perde tempo procurando anotação no papel.</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">Na nuvem</span>
+        <span class="stat-label">Acessa do PC da bancada, do notebook ou de casa. Sem instalar nada e sem licença por máquina.</span>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <main>
+<section class="compare-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Como é a sua rotina hoje?</h2>
+      <p>Se você se identifica com a coluna da esquerda, o ECU Info foi feito pra você.</p>
+    </header>
 
-      
+    <div class="compare-grid">
+      <div class="compare-card bad">
+        <h3>Sem o ECU Info</h3>
+        <ul>
+          <li>Print da placa perdido no celular ou no WhatsApp</li>
+          <li>Anotação no papel que molhou, rasgou ou sumiu</li>
+          <li>Cliente ligando e você tentando lembrar o que fez da última vez</li>
+          <li>Mesmo defeito, mesmo módulo, começando tudo de novo</li>
+          <li>PC da oficina queimou e o histórico de anos foi embora</li>
+          <li>Dependendo de fórum, vídeo ou print de colega</li>
+        </ul>
+      </div>
+      <div class="compare-card good">
+        <h3>Com o ECU Info</h3>
+        <ul>
+          <li>Foto da placa aberta na tela, com os pontos já marcados</li>
+          <li>Histórico do módulo aberto em dois cliques</li>
+          <li>Defeito registrado e fácil de achar pelo código ou sintoma</li>
+          <li>Próximo reparo começa de onde o último parou</li>
+          <li>Tudo na nuvem, na sua conta, mesmo se o PC queimar</li>
+          <li>Sua experiência vira consulta, não depende só da memória</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
-      <section id="benefits" class="benefits-section">
+<section class="benefits-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Sua oficina, seus dados</h2>
+      <p>O conhecimento técnico é o maior patrimônio da bancada. O ECU Info deixa ele organizado, fácil de achar e acessível de qualquer lugar.</p>
+    </header>
 
-        <div class="container">
+    <div class="benefits-grid">
+      <article class="benefit-card">
+        <div class="card-glow"></div>
+        <div class="benefit-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <h3>Acha o defeito sem perder tempo</h3>
+        <p>Abre o módulo na tela, vê a foto que você mesmo anotou e vai direto no ponto: alimentação, massa, driver, MCU. Sem fórum, sem print perdido, sem “eu acho que era nesse pino”.</p>
+      </article>
 
-          <div class="stats-row">
+      <article class="benefit-card">
+        <div class="card-glow"></div>
+        <div class="benefit-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+        </div>
+        <h3>Pinout e defeito marcados na foto</h3>
+        <p>Marque setas, círculos e textos direto na imagem da placa. Destaque trilha rompida, solda fria, capacitor estufado e pontos de medição. Na próxima entrada, é só olhar.</p>
+      </article>
 
-            <div class="stat-item">
+      <article class="benefit-card">
+        <div class="card-glow"></div>
+        <div class="benefit-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
+        <h3>Começa com +30 ECUs prontas</h3>
+        <p>Criou a conta, já está lá: acervo inicial com defeitos comuns, pinagens e observações das principais centrais do mercado brasileiro. Depois você vai somando o que documentar.</p>
+      </article>
 
-              <span class="stat-number">Base Própria</span>
+      <article class="benefit-card">
+        <div class="card-glow"></div>
+        <div class="benefit-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h3>Backup que não fica na bancada</h3>
+        <p>PC da oficina queimou, formatou ou foi roubado? Seu acervo continua intacto. Tudo salvo na nuvem, na sua conta, acessível de qualquer navegador.</p>
+      </article>
 
-              <span class="stat-label">Você constrói e organiza seus próprios módulos</span>
+      <article class="benefit-card">
+        <div class="card-glow"></div>
+        <div class="benefit-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <h3>Busca por módulo, defeito ou componente</h3>
+        <p>Digite “ME 7.5.30” e veja o histórico. Digite “solda fria” e encontre todos os módulos onde você já registrou esse defeito. Sua experiência vira consulta.</p>
+      </article>
 
-            </div>
+      <article class="benefit-card">
+        <div class="card-glow"></div>
+        <div class="benefit-icon" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+          </svg>
+        </div>
+        <h3>Feito pra bancada, não pra escritório</h3>
+        <p>Interface simples, sem menu escondido, pensada pra usar com o módulo aberto na frente. Cadastro rápido, marcação em poucos cliques, consulta imediata. Se usa WhatsApp, usa o ECU Info.</p>
+      </article>
+    </div>
+  </div>
+</section>
 
-            <div class="stat-item">
+<section class="ecu-showcase">
+  <div class="container">
+    <header class="section-header">
+      <h2>Estas ECUs já estão disponíveis</h2>
+      <p>Mais de 30 centrais mapeadas pela equipe, liberadas assim que a conta é criada. Depois você soma as que cadastrar.</p>
+    </header>
 
-              <span class="stat-number">Mais Velocidade</span>
+    <div class="ecu-catalog">
+      <div class="ecu-brand">
+        <h3>Volkswagen</h3>
+        <div class="ecu-tags">
+          <span>ME 7.5.30</span>
+          <span>ME 7.5.10</span>
+          <span>ME 17.5.20</span>
+          <span>Marelli 4AVP</span>
+          <span>Marelli 4GV</span>
+          <span>Marelli 4SV</span>
+          <span>Marelli IAW 1AVB</span>
+          <span>4BV</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Chevrolet / GM</h3>
+        <div class="ecu-tags">
+          <span>Agile / Montana</span>
+          <span>ME 7.9.9</span>
+          <span>Motronic 1.5.4</span>
+          <span>Multec F</span>
+          <span>Multec HSFI</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Fiat</h3>
+        <div class="ecu-tags">
+          <span>Marelli 10GF</span>
+          <span>Marelli 1ABG</span>
+          <span>Marelli IAW 1G7</span>
+          <span>Monomotronic MA 1.7</span>
+          <span>Multec HSFI</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Ford</h3>
+        <div class="ecu-tags">
+          <span>EEC IV Zetec</span>
+          <span>EEC Rocan</span>
+          <span>Fusion 7E5A 12A650-ADA</span>
+          <span>Marelli 4AFR</span>
+          <span>Marelli 4CFR</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Peugeot / Citroën</h3>
+        <div class="ecu-tags">
+          <span>Marelli 5NP2</span>
+          <span>Marelli 5NR1</span>
+          <span>Marelli 6LPB e 6KPB</span>
+          <span>Marelli IAW 48P2</span>
+          <span>Marelli IAW 1AP</span>
+          <span>ME 7.4.4</span>
+          <span>ME 7.4.9</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Renault</h3>
+        <div class="ecu-tags">
+          <span>Siemens Sirius 34</span>
+          <span>Sirius 32</span>
+          <span>EMS 3120</span>
+          <span>Valeo V42</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Hyundai</h3>
+        <div class="ecu-tags">
+          <span>MEG 17.9.12</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Mitsubishi</h3>
+        <div class="ecu-tags">
+          <span>Pajero TR4</span>
+        </div>
+      </div>
+      <div class="ecu-brand">
+        <h3>Multimarcas e outras famílias</h3>
+        <div class="ecu-tags">
+          <span>IAW 4AFB</span>
+          <span>IAW 5NF</span>
+          <span>Marelli 4CF</span>
+          <span>Marelli 7GF</span>
+          <span>ME 17.9.11.1</span>
+          <span>ME 7.9.9</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-              <span class="stat-label">Diagnóstico, comparação e decisão sem retrabalho</span>
+<section id="features" class="features-section">
+  <div class="container">
+    <div class="feature-layout">
+      <div class="feature-text">
+        <h2>Tudo que a bancada precisa,<br>em um só lugar</h2>
+        <p>Cada recurso existe pra resolver um problema real do dia a dia de quem repara central.</p>
 
-            </div>
-
-            <div class="stat-item">
-
-              <span class="stat-number">Controle Total</span>
-
-              <span class="stat-label">Informações, sob seu domínio</span>
-
-            </div>
-
+        <ul class="feature-list">
+          <li>
+            <strong>Mapeamento visual na foto da placa</strong>
+            <p>Sobe a foto do módulo aberto e marca: pino de alimentação, GND, ponto de teste, driver queimado, MCU, memória, cristal e trilha. Adiciona texto, seta e observação direto na imagem.</p>
+          </li>
+          <li>
+            <strong>Organização por família de ECU</strong>
+            <p>Bosch ME7.x, Bosch EDC15/16, Siemens SIM2K, Magneti Marelli IAW, Delphi, Denso, Valeo e outras. Cada módulo com seus defeitos, histórico e observações.</p>
+          </li>
+          <li>
+            <strong>Busca por módulo, componente ou sintoma</strong>
+            <p>Precisa rever o que fez naquele ME 7.5.30? Busca pelo código. Lembra que resolveu solda fria no driver de ignição? Busca pelo sintoma.</p>
+          </li>
+          <li>
+            <strong>Histórico completo por módulo</strong>
+            <p>Cada entrada guarda data, foto, defeito encontrado, solução aplicada e observações. Na próxima vez que o mesmo módulo chegar, você já sabe por onde começar.</p>
+          </li>
+          <li>
+            <strong>Sincronizado e sem instalação</strong>
+            <p>Roda no navegador, no PC da bancada ou no notebook. Sem download, sem licença por máquina, sem depender de um único computador.</p>
+          </li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="visual-card">
+          <div class="search-bar-mock">
+            <span class="search-icon">⌕</span>
+            <span class="typing-text">Bosch ME 7.5.30...</span>
           </div>
-
-        </div>
-
-      </section>
-
-      
-
-      <section class="benefits-section">
-
-        <div class="container">
-
-          <header class="section-header">
-
-            <h2>Sua oficina, seus dados.</h2>
-
-            <p>O conhecimento técnico é o maior ativo da sua oficina. O ECU Info garante que ele fique organizado e acessível.</p>
-
-          </header>
-
-      
-
-          <div class="benefits-grid">
-
-            <article class="benefit-card">
-
-              <div class="card-glow"></div>
-
-              <div class="benefit-icon">⚡</div>
-
-              <h3>Diagnóstico Rápido</h3>
-
-              <p>Acesse os manuais de módulos que você criou em segundos. Nunca comece do zero.</p>
-
-            </article>
-
-      
-
-            <article class="benefit-card">
-
-              <div class="card-glow"></div>
-
-              <div class="benefit-icon">🎯</div>
-
-              <h3>Pinouts Precisos</h3>
-
-              <p>Marque na foto exata da placa onde estão os pontos de alimentação, Componentes e Defeitos.</p>
-
-            </article>
-
-      
-
-            <article class="benefit-card">
-
-              <div class="card-glow"></div>
-
-              <div class="benefit-icon">🔐</div>
-
-              <h3>Segurança Total</h3>
-
-              <p>Backup na nuvem. Se seu computador da oficina queimar, seus esquemas continuam salvos.</p>
-
-            </article>
-
+          <div class="result-list">
+            <div class="result-item active">
+              <span class="code">ME 7.4.9</span>
+              <span class="desc">Principais defeitos: queima de MCU...</span>
+            </div>
+            <div class="result-item">
+              <span class="code">ME 7.4.4</span>
+              <span class="desc">Principais defeitos: trilha do driver rompida...</span>
+            </div>
+            <div class="result-item">
+              <span class="code">ME 7.5.30</span>
+              <span class="desc">Principais defeitos: solda fria no processador...</span>
+            </div>
           </div>
-
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="workflow-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Como funciona na prática</h2>
+      <p>Do módulo aberto na bancada até o banco de dados da oficina, em 4 passos.</p>
+    </header>
+
+    <div class="workflow">
+      <div class="workflow-line"></div>
+      <div class="workflow-step">
+        <div class="step-icon">1</div>
+        <h4>Cadastre o módulo</h4>
+        <p>Informe fabricante, modelo e código (ex: Bosch ME 7.5.30). Leva menos de um minuto.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="step-icon">2</div>
+        <h4>Fotografe e marque</h4>
+        <p>Sobe a foto da placa aberta e aponta componentes, trilhas, defeitos visuais e pontos de medição.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="step-icon">3</div>
+        <h4>Registre a solução</h4>
+        <p>Anote o componente trocado, o defeito encontrado e qualquer observação útil pro próximo reparo.</p>
+      </div>
+      <div class="workflow-step">
+        <div class="step-icon">4</div>
+        <h4>Consulte quando quiser</h4>
+        <p>Na próxima entrada, busca pelo módulo e tem tudo na tela, sem abrir o módulo às cegas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section">
+  <div class="container">
+    <header class="section-header">
+      <h2>Perguntas que todo reparador faz</h2>
+      <p>Respostas diretas, sem enrolação.</p>
+    </header>
+
+    <div class="faq-grid">
+      <article class="faq-card">
+        <h3>Preciso instalar algum programa?</h3>
+        <p>Não. Abre no navegador do PC da bancada e pronto. Sem download, sem licença por máquina, sem atualização complicada.</p>
+      </article>
+      <article class="faq-card">
+        <h3>As +30 ECUs já vêm liberadas?</h3>
+        <p>Sim. Assim que você cria a conta, elas já aparecem disponíveis junto com tudo que você mesmo cadastrar. Fazem parte do seu banco de dados.</p>
+      </article>
+      <article class="faq-card">
+        <h3>Serve pra qualquer módulo, de qualquer marca?</h3>
+        <p>Qualquer um. Bosch, Siemens, Magneti Marelli, Delphi, Denso, Valeo, de qualquer marca e modelo. Você cadastra o que quiser do jeito que fizer sentido pra sua bancada.</p>
+      </article>
+      <article class="faq-card">
+        <h3>Preciso ser expert em informática?</h3>
+        <p>Não. Se usa WhatsApp e YouTube, usa o ECU Info. A interface foi feita pra usar com o módulo aberto na frente, sem menu escondido.</p>
+      </article>
+      <article class="faq-card">
+        <h3>Meus dados ficam salvos onde?</h3>
+        <p>Na nuvem, vinculados à sua conta. Se o PC da oficina queimar, formatar ou for roubado, você continua acessando de qualquer navegador.</p>
+      </article>
+      <article class="faq-card">
+        <h3>Posso cancelar quando quiser?</h3>
+        <p>Pode. Você testa 7 dias grátis, sem cartão de crédito, e cancela a qualquer momento pelo painel, sem burocracia.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta-section">
+  <div class="glow-effect bottom-center"></div>
+  <div class="container relative-z">
+    <h2>Sua próxima bancada pode ser mais rápida</h2>
+    <p class="cta-sub">Crie sua conta grátis e já comece com <strong>+30 ECUs mapeadas</strong> disponíveis pra consulta. Teste completo por 7 dias, sem cartão de crédito.</p>
+    <div class="cta-group">
+      <a href="../../index.html?intent=register" class="cta-button primary large">
+        Criar conta grátis
+      </a>
+    </div>
+    <p class="microcopy">Compatível com PC • Sem instalação • Acesso imediato às ECUs já mapeadas</p>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-content">
+    <div class="footer-brand">
+      <strong>ECU Info</strong>
+      <p>Ferramenta para quem repara central.</p>
+    </div>
+    <nav>
+      <a href="#benefits">Funcionalidades</a>
+      <a href="../../index.html?intent=login">Login</a>
+      <a href="termos-de-uso.html">Termos de Uso</a>
+      <a href="politica-de-privacidade.html">Política de Privacidade</a>
+    </nav>
+  </div>
+</footer>
 
-      </section>
+</body>
 
-      
-
-      <section id="features" class="features-section">
-
-        <div class="container">
-
-          <div class="feature-layout">
-
-            <div class="feature-text">
-
-              <h2>Ferramentas Online,<br>Simplicidade de Uso</h2>
-
-              <p>Desenvolvido pensando na correria do dia a dia da oficina automotiva.</p>
-
-              
-
-              <ul class="feature-list">
-
-                <li>
-
-                  <strong>📸 Mapeamento Visual:</strong>
-
-                  <p>Tire a foto da placa e faça marcações, e textos direto nela.</p>
-
-                </li>
-
-                <li>
-
-                  <strong>📁 Organização por Módulo ECU:</strong>
-
-                  <p>Exemplo: Bosch ME7.5.30. Tudo estruturado.</p>
-
-                </li>
-
-                <li>
-
-                  <strong>🔍 Busca Inteligente:</strong>
-
-                  <p>Digite pelo módulo que você tem precisa rever informações com facilidade.</p>
-
-                </li>
-
-              </ul>
-
-            </div>
-
-            <div class="feature-visual">
-
-              <div class="visual-card">
-
-                <div class="search-bar-mock">
-
-                  <span class="search-icon">🔍</span>
-
-                  <span class="typing-text">Bosch ME7.5.30...</span>
-
-                </div>
-
-                <div class="result-list">
-
-                  <div class="result-item active">
-
-                    <span class="code">ME 7.4.9</span>
-
-                    <span class="desc">Principais Defeitos: Queima de MCU...</span>
-
-                  </div>
-
-                  <div class="result-item">
-
-                    <span class="code">ME 7.4.4</span>
-
-                    <span class="desc">Principais Defeitos: Trilha do Driver Romp...</span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      
-
-      <section class="workflow-section">
-
-        <div class="container">
-
-          <header class="section-header">
-
-            <h2>Forma de Reparo</h2>
-
-          </header>
-
-      
-
-          <div class="workflow">
-
-            <div class="workflow-line"></div>
-
-            
-
-            <div class="workflow-step">
-
-              <div class="step-icon">1</div>
-
-              <h4>Entrada</h4>
-
-              <p>Cadastre o módulo.</p>
-
-            </div>
-
-      
-
-            <div class="workflow-step">
-
-              <div class="step-icon">2</div>
-
-              <h4>Documentação</h4>
-
-              <p>Fotografe a placa aberta e marque os defeitos visuais.</p>
-
-            </div>
-
-      
-
-            <div class="workflow-step">
-
-              <div class="step-icon">3</div>
-
-              <h4>Solução</h4>
-
-              <p>Anote o componente e informações úteis para próximos reparos.</p>
-
-            </div>
-
-      
-
-            <div class="workflow-step">
-
-              <div class="step-icon">4</div>
-
-              <h4>Banco de Dados</h4>
-
-              <p>Pronto. Na próxima vez, a solução já está no seu bolso.</p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      
-
-      <section id="cta" class="cta-section">
-
-        <div class="glow-effect bottom-center"></div>
-
-        <div class="container relative-z">
-
-          <h2>Eleve o nível da sua oficina hoje.</h2>
-
-          <p class="cta-sub">Teste completo por 7 dias. Cancele quando quiser.</p>
-
-          
-
-          <div class="cta-group">
-
-            <a href="../../index.html?intent=register" class="cta-button primary large">
-
-              Começar Teste Grátis
-
-            </a>
-
-          </div>
-
-          <p class="microcopy">Compatível com PC, não há necessidade de instalação, software totalmente online.</p>
-
-        </div>
-
-      </section>
-
-      
-
-      </main>
-
-      
-
-      <footer class="footer">
-
-        <div class="container footer-content">
-
-          <div class="footer-brand">
-
-            <strong>ECU Info</strong>
-
-            <p>Tecnologia para reparação automotiva.</p>
-
-          </div>
-
-          <nav>
-
-            <a href="#benefits">Funcionalidades</a>
-
-            <a href="../../index.html?intent=login">Login</a>
-
-            <a href="termos-de-uso.html">Termos de Uso</a>
-
-            <a href="politica-de-privacidade.html">Politica de Privacidade</a>
-
-          </nav>
-
-        </div>
-
-      </footer>
-
-      
-
-      </body>
 <script type="module">
   import { initAnalytics } from '../analytics.js';
   initAnalytics();
 </script>
+
 </html>
